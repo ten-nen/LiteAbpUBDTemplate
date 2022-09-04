@@ -1,0 +1,36 @@
+﻿@using LiteAbpUBD.Business.Dtos
+@using Microsoft.AspNetCore.Authorization
+@using LiteAbpUBD.Business
+@inject IAuthorizationService authorizationService
+
+@foreach (RoleDto role in Model)
+{
+    <tr>
+        <td class="text-muted">
+            @role.Name
+        </td>
+        <td data-item="@Newtonsoft.Json.JsonConvert.SerializeObject(role)">
+            <div class="btn-list flex-nowrap">
+                @if (!role.IsStatic)
+                {
+                    @if (authorizationService.AuthorizeAsync(PermissionConsts.角色管理_编辑).Result.Succeeded)
+                    {
+                        <a href="#" class="btn page-btn-edit">编辑</a>
+                    }
+                    @if (authorizationService.AuthorizeAsync(PermissionConsts.角色管理_删除).Result.Succeeded)
+                    {
+                        <a href="#" class="btn page-btn-del">删除</a>
+                    }
+                }
+            </div>
+        </td>
+    </tr>
+}
+@if (Model.Count <= 0)
+{
+    <tr>
+        <td class="text-muted" colspan="3">
+            没有更多的数据了..
+        </td>
+    </tr>
+}

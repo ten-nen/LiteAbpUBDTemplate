@@ -1,0 +1,39 @@
+{
+    "author": "Rick Li",
+    "classifications": [ "Web/MVC" ],
+    "name": "LiteAbpUBDTemplate",
+    "identity": "LiteAbpUBDTemplate",
+    "shortName": "lat",
+    "tags": {
+      "language": "C#" ,
+      "type":"project"
+    },
+    "sourceName": "LiteAbpUBD",
+    "preferNameDirectory": true,
+	 "symbols":{
+    "sqlType": {
+      "type": "parameter",
+      "datatype": "choice",
+      "choices": [
+        {
+          "choice": "mssql",
+          "description": "MS SQL Server"
+        },
+        {
+          "choice": "mysql",
+          "description": "MySQL"
+        }
+      ],
+      "defaultValue": "mssql",
+      "description": "The type of SQL to use"
+    },  
+    "mssql": {
+      "type": "computed",
+      "value": "(sqlType == \"mssql\")"
+    },
+    "mysql": {
+      "type": "computed",
+      "value": "(sqlType == \"mysql\")"
+    }
+  }
+}

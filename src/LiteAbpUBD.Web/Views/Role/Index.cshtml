@@ -1,0 +1,172 @@
+﻿@{
+    ViewData["Title"] = "角色管理";
+}
+@model List<LiteAbpUBD.Business.Dtos.PermissionDto>
+@using Microsoft.AspNetCore.Authorization
+@using LiteAbpUBD.Business
+@inject IAuthorizationService authorizationService
+
+<div class="col-12">
+    <div class="card">
+        <div class="card-status-top bg-blue"></div>
+        <div class="row" style="margin: 10px 0px 10px 0px;">
+            <div class="col-md-12 col-xl-1">
+                <div class="btn-list">
+                    @if (authorizationService.AuthorizeAsync(PermissionConsts.角色管理_新增).Result.Succeeded)
+                    {
+                        <a href="#" class="btn btn-primary d-sm-inline-block" id="page-btn-create">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            新增
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-vcenter table-mobile-md card-table" id="page-table">
+                <thead>
+                    <tr>
+                        <th>角色名称</th>
+                        <th class="w-1">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal modal-blur fade" id="page-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog  modal-dialog-scrollable" role="document">
+        <div class="modal-content" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title">新增角色</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form class="modal-body">
+                <div class="mb-3">
+                    <input type="hidden" name="id" />
+                    <label class="form-label">角色名称</label>
+                    <input type="text" class="form-control" name="name" placeholder="请输入角色名称" required>
+                    <div class="invalid-feedback">
+                        角色名称不能为空
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">权限设置</label>
+                    @foreach (var group in Model.Where(x => !x.Name.Contains(".")))
+                    {
+                        <div class="row page-modal-div-permission">
+                            <div class="col-12">
+                                <label class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="Permissions" value="@group.Name">
+                                    <span class="form-check-label">@group.DisplayName</span>
+                                </label>
+                            </div>
+                            <div class="col-1"></div>
+                            <div class="col-11">
+                                @foreach (var permission in Model.Where(x => x.Name.StartsWith(group.Name + ".")))
+                                {
+                                    <label class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="Permissions" value="@permission.Name">
+                                        <span class="form-check-label">@permission.DisplayName?.Replace(group.DisplayName+"_","")</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn me-auto" data-bs-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary modal-submit-btn">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+
+        var $modal = $('#page-modal');
+
+        var loadList = function() {
+            $.get('/Role', function(d) {
+
+                var r = site.partialViewToJson(d);
+                $('#page-table tbody').html(r.html);
+
+                //编辑
+                $('.page-btn-edit').on('click', function() {
+                    var item = $(this).parents('td').data('item');
+                    site.form.setValues($('form.modal-body')[0], item);
+                    $modal.find('.modal-title').text('编辑角色');
+                    $modal.modal('show');
+                    site.draggable('.modal-header');
+                })
+
+                //删除
+                $('.page-btn-del').on('click', function() {
+                    var item = $(this).parents('td').data('item');
+                    site.confirm('提示信息', '删除后无法恢复，是否确认删除?', null, null, function() {
+                        $.post('/Role/Delete', { id: item.Id }, function(d) {
+                            loadList();
+                            site.success('删除成功..');
+                        })
+                    })
+                })
+            })
+        }
+
+        $(function() {
+
+            loadList();
+
+            //新增
+            $('#page-btn-create').on('click', function() {
+                site.form.reset($('form.modal-body')[0]);
+                $modal.find('.modal-title').text('新增角色');
+                $modal.modal('show');
+                site.draggable('.modal-header');
+            });
+
+            //保存
+            $('#page-modal .modal-submit-btn').on('click', function() {
+                var $form = $('#page-modal form.modal-body');
+                if (!$form[0].checkValidity()) {
+                    $form.addClass('was-validated')
+                } else {
+                    var id = $form.find('input[name=id]').val();
+                    $.ajax({
+                        url: id ? '/Role/Update' : '/Role/Create',
+                        type: "POST",
+                        dataType: "json",
+                        data: $form.serialize(),
+                        cache: false,
+                        success: function(d) {
+                            loadList();
+                            site.success('保存成功..');
+                            $modal.modal('hide');
+                        }
+                    });
+                }
+            })
+
+            //权限勾选
+            $('.page-modal-div-permission .col-12 input[type=checkbox]').on('click', function() {
+                var checked = $(this).is(':checked');
+                $(this).parents('.page-modal-div-permission').find('.col-11 input[type=checkbox]').prop('checked', checked);
+            })
+            $('.page-modal-div-permission .col-11 input[type=checkbox]').on('click', function() {
+                var checked = $(this).is(':checked');
+                if (checked) {
+                    $(this).parents('.page-modal-div-permission').find('.col-12 input[type=checkbox]').prop('checked', checked);
+                }
+            })
+
+        })
+    </script>
+}
