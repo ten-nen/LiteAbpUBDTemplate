@@ -8,11 +8,12 @@ using Volo.Abp;
 using Volo.Abp.Data;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.AuditLogging;
+using Volo.Abp.Application;
 
 namespace LiteAbpUBD.Business
 {
     [DependsOn(
-        typeof(Volo.Abp.Application.AbpDddApplicationModule),
+        typeof(AbpDddApplicationModule),
         typeof(DataAccessModule),
         typeof(AbpAuditLoggingDomainModule),
         typeof(AbpIdentityDomainModule),

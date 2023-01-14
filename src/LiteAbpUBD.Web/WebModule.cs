@@ -1,27 +1,24 @@
-﻿using LiteAbpUBD.Business;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.AntiForgery;
 using Volo.Abp.AspNetCore.Serilog;
-using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.Autofac;
-using Volo.Abp.AutoMapper;
 using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Modularity;
 using Volo.Abp.UI.Navigation.Urls;
+using Volo.Abp.Swashbuckle;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using LiteAbpUBD.Business;
+using Microsoft.OpenApi.Models;
 
 namespace LiteAbpUBD.Web
 {
     [DependsOn(
         typeof(BusinessModule),
+        typeof(AbpSwashbuckleModule),
         typeof(AbpAspNetCoreMvcModule),
         typeof(AbpAutofacModule),
         typeof(AbpIdentityAspNetCoreModule),
@@ -37,6 +34,9 @@ namespace LiteAbpUBD.Web
             //配置站点地址
             Configure<AppUrlOptions>(options => options.Applications["Web"].RootUrl = configuration["App:SelfUrl"]);
 
+            Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
+            Configure<IISServerOptions>(options => options.AllowSynchronousIO = true);
+
             //配置认证
             context.Services.AddAuthentication();
             context.Services.ConfigureApplicationCookie(options =>
@@ -48,6 +48,34 @@ namespace LiteAbpUBD.Web
                 options.AccessDeniedPath = "/home/forbidden";
             });
             context.Services.AddAuthorization();
+
+            //配置Swagger
+            context.Services.AddAbpSwaggerGen(
+                options =>
+                {
+                    options.SwaggerDoc("v1", new OpenApiInfo { Title = "LiteAbpUBD API", Version = "v1" });
+                    options.DocInclusionPredicate((docName, description) => true);
+                    options.CustomSchemaIds(type => type.FullName);
+                    options.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+                    {
+                        Description = @"Authorization header using the ApiKey scheme. \r\n\r\n 
+                      Enter 'ApiSign' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'ApiKey 12345abcdef'",
+                        Name = "Authorization",
+                        In = ParameterLocation.Header,
+                        Type = SecuritySchemeType.ApiKey,
+                        Scheme = "ApiKey",
+                    });
+
+                    options.AddSecurityRequirement(new OpenApiSecurityRequirement(){
+                                                    {
+                                                     new OpenApiSecurityScheme{Reference = new OpenApiReference{Type = ReferenceType.SecurityScheme,Id = "ApiKey"}},new string[]{ }
+                                                    }});
+
+                    //options.IncludeXmlComments(Path.Combine(hostingEnvironment.ContentRootPath, "api.web.xml"), true);
+                    //options.IncludeXmlComments(Path.Combine(hostingEnvironment.ContentRootPath, "api.business.xml"));
+                }
+            );
 
             //配置跨域
             context.Services.AddCors(options =>
@@ -102,17 +130,19 @@ namespace LiteAbpUBD.Web
             app.UseStaticFiles();
             app.UseRouting();
             app.UseCors();
-            app.UseAuthentication();
 
             app.UseUnitOfWork();
+            app.UseAuthentication();
             app.UseAuthorization();
+            app.UseSwagger();
+            app.UseAbpSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "LiteAbpUBD API");
+            });
 
             app.UseAuditing();
             app.UseAbpSerilogEnrichers();
             app.UseConfiguredEndpoints();
-
-            var schemes = context.ServiceProvider.GetService<IAuthenticationSchemeProvider>();
-            var sc = schemes.GetAllSchemesAsync();
 
         }
     }

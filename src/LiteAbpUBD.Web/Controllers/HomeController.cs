@@ -1,4 +1,5 @@
-﻿using LiteAbpUBD.Business.Dtos;
+﻿using LiteAbpUBD.Business;
+using LiteAbpUBD.Business.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,9 +12,9 @@ using IdentityUser = Volo.Abp.Identity.IdentityUser;
 
 namespace LiteAbpUBD.Web.Controllers
 {
-    [Authorize]
     [Route("~/", Name = "default")]
     [Route("Home")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class HomeController : AbpController
     {
         protected SignInManager<IdentityUser> SignInManager { get; }
@@ -30,24 +31,21 @@ namespace LiteAbpUBD.Web.Controllers
             IdentitySecurityLogManager = identitySecurityLogManager;
         }
 
-        [AllowAnonymous]
         [Route("NotFound")]
         public new IActionResult NotFound() => View("Error", HttpStatusCode.NotFound);
 
-        [AllowAnonymous]
         [Route("Forbidden")]
         public IActionResult Forbidden() => View("Error", HttpStatusCode.Forbidden);
 
-        [AllowAnonymous]
         [Route("Error")]
         public IActionResult Error(HttpStatusCode code = HttpStatusCode.InternalServerError) => View(code);
 
+        [Authorize(PermissionConsts.主页)]
         public IActionResult Index()
         {
             return View();
         }
 
-        [AllowAnonymous]
         [Route("Login")]
         public async Task<IActionResult> LoginAsync(UserLoginDto dto)
         {
@@ -73,6 +71,7 @@ namespace LiteAbpUBD.Web.Controllers
 
         [HttpGet]
         [Route("Logout")]
+        [Authorize(PermissionConsts.主页)]
         public virtual async Task<IActionResult> Logout()
         {
             await IdentitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext()

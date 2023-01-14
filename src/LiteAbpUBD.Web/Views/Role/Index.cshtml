@@ -10,10 +10,10 @@
     <div class="card">
         <div class="card-status-top bg-blue"></div>
         <div class="row" style="margin: 10px 0px 10px 0px;">
-            <div class="col-md-12 col-xl-1">
-                <div class="btn-list">
-                    @if (authorizationService.AuthorizeAsync(PermissionConsts.角色管理_新增).Result.Succeeded)
-                    {
+            @if (authorizationService.AuthorizeAsync(PermissionConsts.角色管理_新增).Result.Succeeded)
+            {
+                <div class="col-md-12 col-xl-1">
+                    <div class="btn-list">
                         <a href="#" class="btn btn-primary d-sm-inline-block" id="page-btn-create">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -22,9 +22,9 @@
                             </svg>
                             新增
                         </a>
-                    }
+                    </div>
                 </div>
-            </div>
+            }
         </div>
         <div class="table-responsive">
             <table class="table table-vcenter table-mobile-md card-table" id="page-table">
@@ -93,14 +93,14 @@
 
         var $modal = $('#page-modal');
 
-        var loadList = function() {
-            $.get('/Role', function(d) {
+        var loadList = function () {
+            $.get('/Role', function (d) {
 
                 var r = site.partialViewToJson(d);
                 $('#page-table tbody').html(r.html);
 
                 //编辑
-                $('.page-btn-edit').on('click', function() {
+                $('.page-btn-edit').on('click', function () {
                     var item = $(this).parents('td').data('item');
                     site.form.setValues($('form.modal-body')[0], item);
                     $modal.find('.modal-title').text('编辑角色');
@@ -109,10 +109,10 @@
                 })
 
                 //删除
-                $('.page-btn-del').on('click', function() {
+                $('.page-btn-del').on('click', function () {
                     var item = $(this).parents('td').data('item');
-                    site.confirm('提示信息', '删除后无法恢复，是否确认删除?', null, null, function() {
-                        $.post('/Role/Delete', { id: item.Id }, function(d) {
+                    site.confirm('提示信息', '删除后无法恢复，是否确认删除?', null, null, function () {
+                        $.post('/Role/Delete', { id: item.Id }, function (d) {
                             loadList();
                             site.success('删除成功..');
                         })
@@ -121,12 +121,12 @@
             })
         }
 
-        $(function() {
+        $(function () {
 
             loadList();
 
             //新增
-            $('#page-btn-create').on('click', function() {
+            $('#page-btn-create').on('click', function () {
                 site.form.reset($('form.modal-body')[0]);
                 $modal.find('.modal-title').text('新增角色');
                 $modal.modal('show');
@@ -134,7 +134,7 @@
             });
 
             //保存
-            $('#page-modal .modal-submit-btn').on('click', function() {
+            $('#page-modal .modal-submit-btn').on('click', function () {
                 var $form = $('#page-modal form.modal-body');
                 if (!$form[0].checkValidity()) {
                     $form.addClass('was-validated')
@@ -146,7 +146,7 @@
                         dataType: "json",
                         data: $form.serialize(),
                         cache: false,
-                        success: function(d) {
+                        success: function (d) {
                             loadList();
                             site.success('保存成功..');
                             $modal.modal('hide');
@@ -156,11 +156,11 @@
             })
 
             //权限勾选
-            $('.page-modal-div-permission .col-12 input[type=checkbox]').on('click', function() {
+            $('.page-modal-div-permission .col-12 input[type=checkbox]').on('click', function () {
                 var checked = $(this).is(':checked');
                 $(this).parents('.page-modal-div-permission').find('.col-11 input[type=checkbox]').prop('checked', checked);
             })
-            $('.page-modal-div-permission .col-11 input[type=checkbox]').on('click', function() {
+            $('.page-modal-div-permission .col-11 input[type=checkbox]').on('click', function () {
                 var checked = $(this).is(':checked');
                 if (checked) {
                     $(this).parents('.page-modal-div-permission').find('.col-12 input[type=checkbox]').prop('checked', checked);

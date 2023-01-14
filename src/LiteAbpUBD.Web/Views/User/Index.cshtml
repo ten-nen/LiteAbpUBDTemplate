@@ -9,10 +9,10 @@
     <div class="card">
         <div class="card-status-top bg-blue"></div>
         <div class="row" style="margin: 10px 0px 0px 0px;">
-            <div class="col-md-12 col-xl-1">
-                <div class="btn-list">
-                    @if (authorizationService.AuthorizeAsync(PermissionConsts.角色管理_新增).Result.Succeeded)
-                    {
+            @if (authorizationService.AuthorizeAsync(PermissionConsts.用户管理_新增).Result.Succeeded)
+            {
+                <div class="col-md-12 col-xl-1">
+                    <div class="btn-list">
                         <a href="#" class="btn btn-primary d-sm-inline-block" id="page-btn-create">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -21,9 +21,9 @@
                             </svg>
                             新增
                         </a>
-                    }
+                    </div>
                 </div>
-            </div>
+            }
             <div class="col-md-12 col-xl-11">
                 <div class="row">
                     <div class="col-md-12 col-xl-2">
@@ -101,6 +101,10 @@
                     <input type="text" class="form-control" name="phonenumber" placeholder="请输入手机号">
                 </div>
                 <div class="mb-3">
+                    <label class="form-label">ApiSecret</label>
+                    <input type="text" class="form-control" name="apisecret" placeholder="请输入ApiSecret">
+                </div>
+                <div class="mb-3">
                     <label class="form-label">是否启用</label>
                     <input class="form-check-input" type="checkbox" name="isactive" checked="checked" value="true">
                 </div>
@@ -133,7 +137,7 @@
         var $pager = $('#pager');
         var pageIndex = 1;
         var pageSize = 10;
-        var loadList = function(isSearch) {
+        var loadList = function (isSearch) {
             if (isSearch == true) {
                 pageIndex = 1;
                 $pager.removeData('inited');
@@ -142,7 +146,7 @@
             var roleId = $('#page-search-role').val();
             var filter = $('#page-search-filter').val();
 
-            $.get('/User', { roleId: roleId, filter: filter, skipCount: (pageIndex - 1) * pageSize, maxResultCount: pageSize }, function(d) {
+            $.get('/User', { roleId: roleId, filter: filter, skipCount: (pageIndex - 1) * pageSize, maxResultCount: pageSize }, function (d) {
 
                 var r = site.partialViewToJson(d);
                 $('#page-table tbody').html(r.html);
@@ -156,12 +160,12 @@
                         items: r.total,
                         itemsOnPage: pageSize,
                         currentPage: pageIndex,
-                        onInit: function() {
+                        onInit: function () {
                             $pager.data('inited', 'true');
                             //增加样式
                             $pager.find('ul').addClass('pagination ').find('li').addClass('page-item').find('a,span').addClass('page-link');
                         },
-                        onPageClick: function(pageNumber) {
+                        onPageClick: function (pageNumber) {
                             pageIndex = pageNumber;
                             //增加样式
                             $pager.find('ul').addClass('pagination ').find('li').addClass('page-item').find('a,span').addClass('page-link');
@@ -171,7 +175,7 @@
                 }
 
                 //编辑
-                $('.page-btn-edit').on('click', function() {
+                $('.page-btn-edit').on('click', function () {
                     var item = $(this).parents('td').data('item');
                     item.RoleIds = item.Roles.map(x => x.Id);
                     site.form.setValues($('form.modal-body')[0], item);
@@ -183,10 +187,10 @@
                 })
 
                 //删除
-                $('.page-btn-del').on('click', function() {
+                $('.page-btn-del').on('click', function () {
                     var item = $(this).parents('td').data('item');
-                    site.confirm('提示信息', '删除后无法恢复，是否确认删除?', null, null, function() {
-                        $.post('/User/Delete', { id: item.Id }, function(d) {
+                    site.confirm('提示信息', '删除后无法恢复，是否确认删除?', null, null, function () {
+                        $.post('/User/Delete', { id: item.Id }, function (d) {
                             loadList(true);
                             site.success('删除成功..');
                         })
@@ -195,11 +199,11 @@
             });
         }
 
-        $(function() {
+        $(function () {
             loadList(true);
 
             //新增
-            $('#page-btn-create').on('click', function() {
+            $('#page-btn-create').on('click', function () {
                 site.form.reset($('form.modal-body')[0]);
                 $modal.find('.modal-title').text('新增用户');
                 $modal.find('input[name=username]').removeAttr('disabled');
@@ -208,7 +212,7 @@
             });
 
             //保存
-            $('#page-modal .modal-submit-btn').on('click', function() {
+            $('#page-modal .modal-submit-btn').on('click', function () {
                 var $form = $('#page-modal form.modal-body');
                 if (!$form[0].checkValidity()) {
                     $form.addClass('was-validated')
@@ -225,7 +229,7 @@
                         dataType: "json",
                         data: formData,
                         cache: false,
-                        success: function(d) {
+                        success: function (d) {
                             loadList(true);
                             site.success('保存成功..');
                             $modal.modal('hide');
@@ -235,17 +239,17 @@
             })
 
             //选择角色
-            $('#page-search-role').on('change', function() {
+            $('#page-search-role').on('change', function () {
                 loadList(true);
             })
 
             //查询
-            $('#page-search-btn').on('click', function() {
+            $('#page-search-btn').on('click', function () {
                 loadList(true);
             })
 
             //输入框回车查询
-            site.inputEnter('#page-search-filter', function() { loadList(true); })
+            site.inputEnter('#page-search-filter', function () { loadList(true); })
         })
     </script>
 }

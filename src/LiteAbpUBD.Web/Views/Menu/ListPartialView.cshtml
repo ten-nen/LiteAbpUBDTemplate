@@ -1,0 +1,200 @@
+﻿@using LiteAbpUBD.Business.Dtos
+@using Microsoft.AspNetCore.Authorization
+@using LiteAbpUBD.Business
+@inject IAuthorizationService authorizationService
+
+@model List<MenuDto>
+@foreach (MenuDto menu1 in Model.Where(x => x.Pid == 0).OrderByDescending(x => x.Order))
+{
+    <tr>
+        <td class="text-muted">
+            @if (Model.Any(x => x.Pid == menu1.Id))
+            {
+                <span style="cursor:pointer;" class="page-operator-expand">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display:none;" class="icon icon-tabler icon-tabler-caret-down" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M6 10l6 6l6 -6h-12"></path>
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-caret-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M10 18l6 -6l-6 -6v12"></path>
+                    </svg>
+                </span>
+            }
+            else
+            {
+                <span style="margin-left:26px;cursor:pointer;" class="page-operator-expand"></span>
+            }
+            @menu1.Title
+        </td>
+        <td class="text-muted">
+            @switch (menu1.Icon)
+            {
+                case "home":
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><polyline points="5 12 3 12 12 3 21 12 19 12"></polyline><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path></svg>
+                    break;
+                case "menu":
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <line x1="4" y1="8" x2="20" y2="8"></line>
+                        <line x1="4" y1="16" x2="20" y2="16"></line>
+                    </svg>
+                    break;
+                case "user":
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                        <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+                    </svg>
+                    break;
+                case "data":
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-article" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                        <path d="M7 8h10"></path>
+                        <path d="M7 12h10"></path>
+                        <path d="M7 16h10"></path>
+                    </svg>
+                    break;
+                case "chart":
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-align-box-bottom-center" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                        <path d="M9 15v2"></path>
+                        <path d="M12 11v6"></path>
+                        <path d="M15 13v4"></path>
+                    </svg>
+                    break;
+                case "more":
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><rect x="4" y="4" width="6" height="5" rx="2"></rect><rect x="4" y="13" width="6" height="7" rx="2"></rect><rect x="14" y="4" width="6" height="7" rx="2"></rect><rect x="14" y="15" width="6" height="5" rx="2"></rect></svg>
+                    break;
+                case "extra":
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-puzzle" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M4 7h3a1 1 0 0 0 1 -1v-1a2 2 0 0 1 4 0v1a1 1 0 0 0 1 1h3a1 1 0 0 1 1 1v3a1 1 0 0 0 1 1h1a2 2 0 0 1 0 4h-1a1 1 0 0 0 -1 1v3a1 1 0 0 1 -1 1h-3a1 1 0 0 1 -1 -1v-1a2 2 0 0 0 -4 0v1a1 1 0 0 1 -1 1h-3a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h1a2 2 0 0 0 0 -4h-1a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1"></path>
+                    </svg>
+                    break;
+                case "notice":
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-bell-ringing" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"></path>
+                        <path d="M9 17v1a3 3 0 0 0 6 0v-1"></path>
+                        <path d="M21 6.727a11.05 11.05 0 0 0 -2.794 -3.727"></path>
+                        <path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727"></path>
+                    </svg>
+                    break;
+                case "like":
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"></path></svg>
+                    break;
+            }
+        </td>
+        <td class="text-muted">
+            @menu1.Route
+        </td>
+        <td class="text-muted">
+            @menu1.Order
+        </td>
+        <td data-item="@Newtonsoft.Json.JsonConvert.SerializeObject(menu1)">
+            <div class="btn-list flex-nowrap">
+                @if (authorizationService.AuthorizeAsync(PermissionConsts.菜单管理_新增).Result.Succeeded)
+                {
+                    <a href="#" class="btn page-btn-createchild">新增子菜单</a>
+                }
+                @if (authorizationService.AuthorizeAsync(PermissionConsts.菜单管理_编辑).Result.Succeeded)
+                {
+                    <a href="#" class="btn page-btn-edit">编辑</a>
+                }
+                @if (authorizationService.AuthorizeAsync(PermissionConsts.菜单管理_删除).Result.Succeeded)
+                {
+                    <a href="#" class="btn page-btn-del">删除</a>
+                }
+            </div>
+        </td>
+    </tr>
+
+    foreach (var menu2 in Model.Where(x => x.Pid == menu1.Id).OrderByDescending(x => x.Order))
+    {
+        <tr class="page-operator-expand-pid@(menu1.Id)" style="display:none;">
+            <td class="text-muted">
+                @if (Model.Any(x => x.Pid == menu2.Id))
+                {
+                    <span style="margin-left:40px;cursor:pointer;" class="page-operator-expand">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="display:none;" class="icon icon-tabler icon-tabler-caret-down" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M6 10l6 6l6 -6h-12"></path>
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-caret-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M10 18l6 -6l-6 -6v12"></path>
+                        </svg>
+                    </span>
+                }
+                else
+                {
+                    <span style="margin-left:52px;cursor:pointer;" class="page-operator-expand"></span>
+                }
+                @menu2.Title
+            </td>
+            <td class="text-muted">
+            </td>
+            <td class="text-muted">
+                @menu2.Route
+            </td>
+            <td class="text-muted">
+                @menu2.Order
+            </td>
+            <td data-item="@Newtonsoft.Json.JsonConvert.SerializeObject(menu2)">
+                <div class="btn-list flex-nowrap">
+                    @if (authorizationService.AuthorizeAsync(PermissionConsts.菜单管理_新增).Result.Succeeded)
+                    {
+                        <a href="#" class="btn page-btn-createchild">新增子菜单</a>
+                    }
+                    @if (authorizationService.AuthorizeAsync(PermissionConsts.菜单管理_编辑).Result.Succeeded)
+                    {
+                        <a href="#" class="btn page-btn-edit">编辑</a>
+                    }
+                    @if (authorizationService.AuthorizeAsync(PermissionConsts.菜单管理_删除).Result.Succeeded)
+                    {
+                        <a href="#" class="btn page-btn-del">删除</a>
+                    }
+                </div>
+            </td>
+        </tr>
+        foreach (var menu3 in Model.Where(x => x.Pid == menu2.Id).OrderByDescending(x => x.Order))
+        {
+            <tr class="page-operator-expand-pid@(menu2.Id)" style="display:none;">
+                <td class="text-muted">
+                    <span style="margin-left:80px;"></span>@menu3.Title
+                </td>
+                <td class="text-muted">
+                </td>
+                <td class="text-muted">
+                    @menu3.Route
+                </td>
+                <td class="text-muted">
+                    @menu3.Order
+                </td>
+                <td data-item="@Newtonsoft.Json.JsonConvert.SerializeObject(menu3)">
+                    <div class="btn-list flex-nowrap">
+                        @if (authorizationService.AuthorizeAsync(PermissionConsts.菜单管理_编辑).Result.Succeeded)
+                        {
+                            <a href="#" class="btn page-btn-edit">编辑</a>
+                        }
+                        @if (authorizationService.AuthorizeAsync(PermissionConsts.菜单管理_删除).Result.Succeeded)
+                        {
+                            <a href="#" class="btn page-btn-del">删除</a>
+                        }
+                    </div>
+                </td>
+            </tr>
+        }
+    }
+}
+@if (Model.Count <= 0)
+{
+    <tr>
+        <td class="text-muted" colspan="5">
+            没有更多的数据了..
+        </td>
+    </tr>
+}

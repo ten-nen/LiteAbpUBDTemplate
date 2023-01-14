@@ -64,6 +64,9 @@ namespace LiteAbpUBD.Business.Services
                     user.SetIsActive(dto.IsActive);
                 }
 
+                if (!string.IsNullOrEmpty(dto.ApiSecret))
+                    user.SetProperty(nameof(dto.ApiSecret), dto.ApiSecret, false);
+
                 user.Roles.Clear();
                 if (dto.RoleIds != null)
                 {
@@ -103,6 +106,9 @@ namespace LiteAbpUBD.Business.Services
                 }
 
                 ObjectMapper.Map(dto, user);
+
+                if (!string.IsNullOrEmpty(dto.ApiSecret))
+                    user.SetProperty(nameof(dto.ApiSecret), dto.ApiSecret, false);
 
                 var result = UserManager.CreateAsync(user, dto.Password, false).Result;
                 if (!result.Succeeded)

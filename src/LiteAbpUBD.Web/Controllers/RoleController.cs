@@ -11,6 +11,7 @@ namespace LiteAbpUBD.Web.Controllers
 {
     [Route("Role")]
     [Authorize(PermissionConsts.角色管理)]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class RoleController : AbpController
     {
         protected RoleService RoleService { get; }

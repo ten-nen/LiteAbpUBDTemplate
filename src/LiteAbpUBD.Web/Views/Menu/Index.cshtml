@@ -1,0 +1,284 @@
+﻿@{
+    ViewData["Title"] = "菜单管理";
+}
+
+@inject Volo.Abp.Users.ICurrentUser currentUser
+@using Microsoft.AspNetCore.Authorization
+@using LiteAbpUBD.Business
+@inject IAuthorizationService authorizationService
+
+<div class="col-12">
+    <div class="card">
+        <div class="card-status-top bg-blue"></div>
+        <div class="row" style="margin: 10px 0px 0px 0px;">
+            @if (authorizationService.AuthorizeAsync(PermissionConsts.菜单管理_新增).Result.Succeeded)
+            {
+                <div class="col-md-12 col-xl-1">
+                    <div class="btn-list">
+                        <a href="#" class="btn btn-primary d-sm-inline-block" id="page-btn-create">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            新增
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="table-responsive">
+            <table class="table table-vcenter card-table" id="page-table">
+                <thead>
+                    <tr>
+                        <th>菜单名称</th>
+                        <th>图标</th>
+                        <th>路由地址</th>
+                        <th>排序</th>
+                        <th class="w-1">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="page-modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title">新增菜单</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form class="modal-body">
+                <div class="mb-3">
+                    <input type="hidden" name="id" />
+                    <input type="hidden" name="pid" value="0" />
+                    <label class="form-label">菜单名称</label>
+                    <input type="text" class="form-control" name="title" placeholder="请输入菜单名称" required>
+                    <div class="invalid-feedback">
+                        菜单名称不能为空
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">图标</label>
+                    <div class="form-selectgroup">
+                        <label class="form-selectgroup-item">
+                            <input type="radio" name="icon" value="home" class="form-selectgroup-input" checked="">
+                            <span class="form-selectgroup-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><polyline points="5 12 3 12 12 3 21 12 19 12"></polyline><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path></svg>
+                            </span>
+                        </label>
+                        <label class="form-selectgroup-item">
+                            <input type="radio" name="icon" value="menu" class="form-selectgroup-input" checked="">
+                            <span class="form-selectgroup-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <line x1="4" y1="8" x2="20" y2="8"></line>
+                                    <line x1="4" y1="16" x2="20" y2="16"></line>
+                                </svg>
+                            </span>
+                        </label>
+                        <label class="form-selectgroup-item">
+                            <input type="radio" name="icon" value="user" class="form-selectgroup-input">
+                            <span class="form-selectgroup-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+                                </svg>
+                            </span>
+                        </label>
+                        <label class="form-selectgroup-item">
+                            <input type="radio" name="icon" value="data" class="form-selectgroup-input">
+                            <span class="form-selectgroup-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-article" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                                    <path d="M7 8h10"></path>
+                                    <path d="M7 12h10"></path>
+                                    <path d="M7 16h10"></path>
+                                </svg>
+                            </span>
+                        </label>
+                        <label class="form-selectgroup-item">
+                            <input type="radio" name="icon" value="chart" class="form-selectgroup-input">
+                            <span class="form-selectgroup-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-align-box-bottom-center" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                                    <path d="M9 15v2"></path>
+                                    <path d="M12 11v6"></path>
+                                    <path d="M15 13v4"></path>
+                                </svg>
+                            </span>
+                        </label>
+                        <label class="form-selectgroup-item">
+                            <input type="radio" name="icon" value="more" class="form-selectgroup-input">
+                            <span class="form-selectgroup-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><rect x="4" y="4" width="6" height="5" rx="2"></rect><rect x="4" y="13" width="6" height="7" rx="2"></rect><rect x="14" y="4" width="6" height="7" rx="2"></rect><rect x="14" y="15" width="6" height="5" rx="2"></rect></svg>
+                            </span>
+                        </label>
+                        <label class="form-selectgroup-item">
+                            <input type="radio" name="icon" value="extra" class="form-selectgroup-input">
+                            <span class="form-selectgroup-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-puzzle" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M4 7h3a1 1 0 0 0 1 -1v-1a2 2 0 0 1 4 0v1a1 1 0 0 0 1 1h3a1 1 0 0 1 1 1v3a1 1 0 0 0 1 1h1a2 2 0 0 1 0 4h-1a1 1 0 0 0 -1 1v3a1 1 0 0 1 -1 1h-3a1 1 0 0 1 -1 -1v-1a2 2 0 0 0 -4 0v1a1 1 0 0 1 -1 1h-3a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h1a2 2 0 0 0 0 -4h-1a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1"></path>
+                                </svg>
+                            </span>
+                        </label>
+                        <label class="form-selectgroup-item">
+                            <input type="radio" name="icon" value="notice" class="form-selectgroup-input">
+                            <span class="form-selectgroup-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-bell-ringing" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"></path>
+                                    <path d="M9 17v1a3 3 0 0 0 6 0v-1"></path>
+                                    <path d="M21 6.727a11.05 11.05 0 0 0 -2.794 -3.727"></path>
+                                    <path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727"></path>
+                                </svg>
+                            </span>
+                        </label>
+                        <label class="form-selectgroup-item">
+                            <input type="radio" name="icon" value="like" class="form-selectgroup-input">
+                            <span class="form-selectgroup-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"></path></svg>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">路由地址</label>
+                    <input type="text" class="form-control" name="route" placeholder="请输入路由地址">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">排序</label>
+                    <input type="number" class="form-control" name="order" placeholder="请输入排序">
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn me-auto" data-bs-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary modal-submit-btn">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        var $modal = $('#page-modal');
+
+        var hideExpand = function ($element) {
+            var item = $element.children('td').last().data('item');
+
+            $('.page-operator-expand-pid' + item.id).each(function (index, child) {
+                hideExpand($(child));
+            })
+            $('.page-operator-expand-pid' + item.id).hide();
+            $element.children('td').first().find('.icon-tabler-caret-down').hide();
+            $element.children('td').first().find('.icon-tabler-caret-right').show();
+        };
+
+        var loadList = function () {
+
+            $.get('/Menu', function (d) {
+
+                $('#page-table tbody').html(d);
+
+                //展开
+                $('.page-operator-expand').on('click', function () {
+                    var expand = $(this).children('.icon-tabler-caret-down').is(':visible');
+                    var item = $(this).parent('td').siblings().last().data('item');
+                    if (expand) {
+                        //收起
+                        hideExpand($(this).parent('td').parent('tr')) //隐藏子节点
+
+                        $('.page-operator-expand-pid' + item.id).hide();
+                        $(this).children('.icon-tabler-caret-down').hide();
+                        $(this).children('.icon-tabler-caret-right').show();
+                    } else {
+                        //展开
+                        $('.page-operator-expand-pid' + item.id).show();
+                        $(this).children('.icon-tabler-caret-down').show();
+                        $(this).children('.icon-tabler-caret-right').hide();
+                    }
+                })
+
+                //新增子菜单
+                $('.page-btn-createchild').on('click', function () {
+                    site.form.reset($('form.modal-body')[0]);
+                    var item = $(this).parents('td').data('item');
+                    site.form.setValues($('form.modal-body')[0], { pid: item.id });
+                    $modal.find('.modal-title').text('【' + item.title + '】新增子菜单');
+                    $modal.find('input[name=icon]').parent().hide();
+                    $modal.modal('show');
+                    site.draggable('.modal-header');
+                });
+
+                //编辑
+                $('.page-btn-edit').on('click', function () {
+                    var item = $(this).parents('td').data('item');
+                    site.form.setValues($('form.modal-body')[0], item);
+                    $modal.find('.modal-title').text('编辑菜单');
+                    if (item.pid == 0)
+                        $modal.find('input[name=icon]').parent().show();
+                    else
+                        $modal.find('input[name=icon]').parent().hide();
+                    $modal.modal('show');
+                    site.draggable('.modal-header');
+                })
+
+                //删除
+                $('.page-btn-del').on('click', function () {
+                    var item = $(this).parents('td').data('item');
+                    site.confirm('提示信息', '删除后无法恢复，是否确认删除?', null, null, function () {
+                        $.post('/Menu/Delete', { id: item.id }, function (d) {
+                            loadList();
+                            site.success('删除成功..');
+                        })
+                    })
+                })
+            });
+        }
+
+        $(function () {
+            loadList();
+
+            //新增
+            $('#page-btn-create').on('click', function () {
+                site.form.reset($('form.modal-body')[0]);
+                $modal.find('.modal-title').text('新增菜单');
+                $modal.find('input[name=icon]').parent().show();
+                $modal.modal('show');
+                site.draggable('.modal-header');
+            });
+
+            //保存
+            $('#page-modal .modal-submit-btn').on('click', function () {
+                var $form = $('#page-modal form.modal-body');
+                if (!$form[0].checkValidity()) {
+                    $form.addClass('was-validated')
+                } else {
+                    var formData = $form.serialize();
+                    var id = $form.find('input[name=id]').val();
+                    $.ajax({
+                        url: id ? '/Menu/Update' : '/Menu/Create',
+                        type: "POST",
+                        dataType: "json",
+                        data: formData,
+                        cache: false,
+                        success: function (d) {
+                            loadList();
+                            site.success('保存成功..');
+                            $modal.modal('hide');
+                        }
+                    });
+                }
+            })
+        })
+    </script>
+    }

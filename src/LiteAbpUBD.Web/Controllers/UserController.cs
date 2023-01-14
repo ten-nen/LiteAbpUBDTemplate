@@ -10,6 +10,7 @@ namespace LiteAbpUBD.Web.Controllers
 {
     [Authorize(PermissionConsts.用户管理)]
     [Route("User")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class UserController : AbpController
     {
         protected UserService UserService { get; }
@@ -35,7 +36,7 @@ namespace LiteAbpUBD.Web.Controllers
 
         [Authorize(PermissionConsts.用户管理_新增)]
         [Route("Create")]
-        public IActionResult Create(UserCreateOrUpdateDto dto)=>CreateOrUpdate(dto);
+        public IActionResult Create(UserCreateOrUpdateDto dto) => CreateOrUpdate(dto);
 
         [Authorize(PermissionConsts.用户管理_编辑)]
         [Route("Update")]
