@@ -2,6 +2,8 @@
 ### 后端：[ABP](https://github.com/abpframework/abp) 
 ### 前端UI库：[tabler](https://github.com/tabler/tabler)
 
+## DDD架构版本 ABP+Element UI：[LiteAbpTemplate](https://github.com/ten-nen/LiteAbpTemplate)
+
 ### 环境要求：NET6
 
 ## 使用步骤
@@ -46,3 +48,7 @@ dotnet run --urls http://localhost:5000
 #### 角色
 !["角色"](/imgs/role_new.png "角色")
 !["角色"](/imgs/role_new_m.png "角色")
+
+#### 菜单
+!["菜单"](/imgs/menu.png "菜单")
+!["菜单"](/imgs/menu_m.png "菜单")
