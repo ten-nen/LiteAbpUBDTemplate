@@ -6,16 +6,16 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["UBD.LiteAbp.Web/UBD.LiteAbp.Web.csproj", "UBD.LiteAbp.Web/"]
-RUN dotnet restore "UBD.LiteAbp.Web/UBD.LiteAbp.Web.csproj"
+COPY ["LiteAbpUBD.Web/LiteAbpUBD.Web.csproj", "LiteAbpUBD.Web/"]
+RUN dotnet restore "LiteAbpUBD.Web/LiteAbpUBD.Web.csproj"
 COPY . .
-WORKDIR "/src/UBD.LiteAbp.Web"
-RUN dotnet build "UBD.LiteAbp.Web.csproj" -c Release -o /app/build
+WORKDIR "/src/LiteAbpUBD.Web"
+RUN dotnet build "LiteAbpUBD.Web.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "UBD.LiteAbp.Web.csproj" -c Release -o /app/publish
+RUN dotnet publish "LiteAbpUBD.Web.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "UBD.LiteAbp.Web.dll"]
+ENTRYPOINT ["dotnet", "LiteAbpUBD.Web.dll"]

@@ -1,4 +1,4 @@
-namespace UBD.LiteAbp.Web.Models
+namespace LiteAbpUBD.Web.Models
 {
     public class ErrorViewModel
     {

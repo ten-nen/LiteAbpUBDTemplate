@@ -8,7 +8,7 @@
     }
   },
   "profiles": {
-    "UBD.LiteAbp.Web": {
+    "LiteAbpUBD.Web": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

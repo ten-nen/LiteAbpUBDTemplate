@@ -9,8 +9,7 @@ namespace LiteAbpUBD.Business.Dtos.OpenApis
         /// <summary>
         /// 签名
         /// </summary>
-        [Required]
-        [StringLength(32)]
+        [Required, MinLength(1), MaxLength(32)]
         public string Sign { get; set; }
         /// <summary>
         /// 时间戳（秒）

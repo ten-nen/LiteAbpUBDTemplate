@@ -2,7 +2,6 @@
 using LiteAbpUBD.Web;
 using Serilog;
 using Serilog.Events;
-using UBD.LiteAbp.Web;
 
 Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
