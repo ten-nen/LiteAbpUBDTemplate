@@ -5,8 +5,6 @@ namespace LiteAbpUBD.Business
 {
     public static class PermissionConsts
     {
-        public const string 主页 = "home";
-
         public const string 角色管理 = "role";
         public const string 角色管理_新增 = "role.create";
         public const string 角色管理_编辑 = "role.update";

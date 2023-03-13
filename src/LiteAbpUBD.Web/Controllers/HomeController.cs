@@ -40,7 +40,7 @@ namespace LiteAbpUBD.Web.Controllers
         [Route("Error")]
         public IActionResult Error(HttpStatusCode code = HttpStatusCode.InternalServerError) => View(code);
 
-        [Authorize(PermissionConsts.主页)]
+        [Authorize]
         public IActionResult Index()
         {
             return View();
@@ -71,7 +71,7 @@ namespace LiteAbpUBD.Web.Controllers
 
         [HttpGet]
         [Route("Logout")]
-        [Authorize(PermissionConsts.主页)]
+        [Authorize]
         public virtual async Task<IActionResult> Logout()
         {
             await IdentitySecurityLogManager.SaveAsync(new IdentitySecurityLogContext()

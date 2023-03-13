@@ -16,7 +16,6 @@
         menus = JsonConvert.DeserializeObject<List<MenuDto>>(menusJson);
 
     var routePolicy = actionDescriptorCollectionProvider.ActionDescriptors.Items
-                                                     .Where(x => x.EndpointMetadata.Any(e => e is AuthorizeAttribute))
                                                      .Select(x => new
                                                      {
                                                          RoutePath = $"/{x.RouteValues["Controller"]?.ToLower()}/{x.RouteValues["Action"]?.ToLower()}",
@@ -32,6 +31,10 @@
             return false;
 
         var policy = string.IsNullOrWhiteSpace(menu.Route) ? null : routePolicy.FirstOrDefault(rp => menu.Route.Equals(rp.RoutePath, StringComparison.OrdinalIgnoreCase) || (menu.Route + "/index").Equals(rp.RoutePath, StringComparison.OrdinalIgnoreCase))?.Policy;
+
+        if (!string.IsNullOrWhiteSpace(menu.Route) && string.IsNullOrWhiteSpace(policy))
+            return true;
+
         if (!string.IsNullOrWhiteSpace(policy) && authorizationService.AuthorizeAsync(policy).Result.Succeeded)
             return true;
         foreach (var item in menus.Where(x => x.Pid == id))
