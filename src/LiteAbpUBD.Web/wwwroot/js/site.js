@@ -22,7 +22,7 @@ var site = (function () {
         });
     }
 
-    var messageHtml = '<div id="site-message" class="alert col-lg-3" style="z-index: 99999;position: fixed;top: 10%;left: 50%;word-break: break-all;transform: translate(-50%,-50%);text-overflow: ellipsis;white-space: nowrap;overflow: hidden;display:none;" role="alert"><span></span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="top: 0;position: fixed;right: 0;margin: 3px;"></button></div>';
+    var messageHtml = '<div id="site-message" class="toast-container position-fixed top-0 end-0 p-3" ><div class="toast" role="alert" aria-live="assertive" aria-atomic="true"><div class="toast-header"><span class="rounded me-2"></span><strong class="me-auto">提示信息</strong><button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button></div><div class="toast-body"></div></div></div></div>';
     var confirmHtml = '<div class="modal modal-blur" id="site-confirm" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-dialog modal-sm" role="document"><div class="modal-content"><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button><div class="modal-body text-center py-4"><h3 class="site-confirm-title"></h3><div class="text-muted site-confirm-content"></div></div><div class="modal-footer"><div class="w-100"><div class="row"><div class="col"><a href="#" class="btn w-100 site-confirm-cancle"></a></div><div class="col"><a href="#" class="btn btn-danger w-100 site-confirm-ok"></a></div></div></div></div></div></div></div>';
     var loadingHtml = '<div class="modal modal-blur" id="site-loading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-sm" role="document"><div class="spinner-border spinner-border text-muted" role="status" style="--tblr-spinner-width: 2rem;--tblr-spinner-height: 2rem;margin: 0 auto;"></div></div></div>';
     var dialogHtml = '<div class="row">';
@@ -40,6 +40,7 @@ var site = (function () {
     that.confirm = function (title, content, okTx, cancleTx, okCb, cancleCb) {
         $('#site-confirm .site-confirm-title').text(title || '提示信息');
         $('#site-confirm .site-confirm-content').text(content);
+
         $('#site-confirm .site-confirm-ok').text(okTx || '确定').unbind('click').on('click', function () {
             $confrim.modal('hide');
             if (typeof (okCb) === 'function')
@@ -50,23 +51,40 @@ var site = (function () {
             if (typeof (cancleCb) === 'function')
                 cancleCb();
         });
+        $('#site-confirm .site-confirm-cancle').parent().show();
         $confrim.modal('show');
         site.draggable('.modal-body');
     };
-    that.message = function (msg, type, cb) {
-        $message.removeClass(function (index, className) {
-            return (className.match(/(^|\s)alert-\S+/g) || []).join(' ');
+    that.alert = function (title, content, btnTx, btnCb) {
+        $('#site-confirm .site-confirm-title').text(title || '提示信息');
+        $('#site-confirm .site-confirm-content').text(content);
+
+        $('#site-confirm .site-confirm-ok').text(btnTx || '确定').unbind('click').on('click', function () {
+            $confrim.modal('hide');
+            if (typeof (btnCb) === 'function')
+                btnCb();
         });
-        $message.addClass('alert-' + type);
-        $message.find('span').text(msg);
-        $message.fadeIn().fadeOut(2000, cb);
+        $('#site-confirm .site-confirm-cancle').parent().hide();
+        $confrim.modal('show');
+        site.draggable('.modal-body');
     };
-    that.success = function (msg, cb) {
-        this.message(msg, 'success', cb);
+    that.message = function (msg, svg) {
+        $message.find('.toast-body').text(msg);
+        $message.find('.rounded').html(svg);
+        new bootstrap.Toast($message.children()[0]).show();
+    };
+    that.success = function (msg) {
+        that.message(msg, '<svg fill="#67c23a" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>');
     }
-    that.error = function (msg, cb) {
-        this.message(msg, 'danger', cb);
+    that.error = function (msg) {
+        that.message(msg, '<svg fill="#f56c6c" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/></svg>');
     }
+    that.info = function (msg) {
+        that.message(msg, '<svg fill="#909399" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>');
+    };
+    that.warning = function (msg) {
+        that.message(msg, '<svg fill="#e6a23c" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle-fill" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>');
+    };
     that.loading = function (isshow) {
         if (isshow == undefined || isshow == true)
             $loading.modal('show');
