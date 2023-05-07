@@ -1,0 +1,41 @@
+﻿@page "~/"
+@model IndexModel
+@using Microsoft.AspNetCore.Authorization;
+@{
+    ViewData["Title"] = "主页";
+}
+
+
+<div class="page-header d-print-none">
+    <div class="container">
+        <div class="row g-3 align-items-center">
+            <div class="col-auto">
+                <span class="status-indicator status-green status-indicator-animated">
+                    <span class="status-indicator-circle"></span>
+                    <span class="status-indicator-circle"></span>
+                    <span class="status-indicator-circle"></span>
+                </span>
+            </div>
+            <div class="col">
+                <h2 class="page-title">
+                    姓名
+                </h2>
+                <div class="text-muted">
+                    <ul class="list-inline list-inline-dots mb-0">
+                        <li class="list-inline-item"><span class="text-green">部门</span></li>
+                        <li class="list-inline-item">测试部</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Page body -->
+<div class="page-body">
+    <div class="container-xl">
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+    </script>
+}

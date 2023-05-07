@@ -1,0 +1,10 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+    "Permission:Admin": "管理后台",
+    "Permission:Admin.Roles": "角色管理",
+    "Permission:Admin.Roles.Create": "新增角色",
+    "Permission:Admin.Roles.Update": "编辑角色",
+    "Permission:Admin.Roles.Delete": "删除角色"
+  }
+}

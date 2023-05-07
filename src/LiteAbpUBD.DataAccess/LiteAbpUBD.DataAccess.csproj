@@ -10,15 +10,18 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Volo.Abp.AuditLogging.EntityFrameworkCore" Version="6.0.2" />
-		<PackageReference Include="Volo.Abp.Identity.EntityFrameworkCore" Version="6.0.2" />
-		<PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" Version="6.0.2" />
-		<PackageReference Include="Volo.Abp.SettingManagement.EntityFrameworkCore" Version="6.0.2" />
-		<PackageReference Condition="'$(mssql)' == '' OR '$(mssql)' == 'True' " Include="Volo.Abp.EntityFrameworkCore.SqlServer" Version="6.0.2" />
-		<PackageReference Condition="'$(mysql)' == 'True' " Include="Volo.Abp.EntityFrameworkCore.MySQL" Version="6.0.2" />
+		<PackageReference Include="Volo.Abp.AuditLogging.EntityFrameworkCore" Version="6.0.3" />
+		<PackageReference Include="Volo.Abp.Identity.EntityFrameworkCore" Version="6.0.3" />
+		<PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" Version="6.0.3" />
+		<PackageReference Include="Volo.Abp.SettingManagement.EntityFrameworkCore" Version="6.0.3" />
+		<PackageReference Condition="'$(mssql)' == '' OR '$(mssql)' == 'True' " Include="Volo.Abp.EntityFrameworkCore.SqlServer" Version="6.0.3" />
+		<PackageReference Condition="'$(mysql)' == 'True' " Include="Volo.Abp.EntityFrameworkCore.MySQL" Version="6.0.3" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Migrations\" />
 	  <Folder Include="Entities\" />
+	  <Folder Include="Migrations\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\LiteAbpUBD.Common\LiteAbpUBD.Common.csproj" />
 	</ItemGroup>
 </Project>

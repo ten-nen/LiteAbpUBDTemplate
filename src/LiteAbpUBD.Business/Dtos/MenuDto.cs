@@ -1,22 +1,21 @@
-﻿
-
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace LiteAbpUBD.Business.Dtos
 {
     public class MenuDto
     {
-        [JsonProperty("id")]
         public int Id { get; set; }
-        [JsonProperty("pid")]
         public int Pid { get; set; }
-        [JsonProperty("icon")]
+        public string TreeId { get; set; }         
         public string Icon { get; set; }
-        [JsonProperty("title")]
         public string Title { get; set; }
-        [JsonProperty("route")]
         public string Route { get; set; }
-        [JsonProperty("order")]
-        public int Order { get; set; }
+        public int Order { get; set; }   
     }
 }

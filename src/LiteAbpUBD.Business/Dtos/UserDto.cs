@@ -27,6 +27,7 @@ namespace LiteAbpUBD.Business.Dtos
         public string Name { get; set; }
         public string PhoneNumber { get; set; }
         public bool IsActive { get; set; }
+        public string ApiSecret { get; set; }
         public List<RoleDto> Roles { get; set; }
     }
 

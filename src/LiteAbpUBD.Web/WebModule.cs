@@ -3,21 +3,32 @@ using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.Mvc;
-using Volo.Abp.AspNetCore.Mvc.AntiForgery;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
 using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Modularity;
 using Volo.Abp.UI.Navigation.Urls;
+using Microsoft.OpenApi.Models;
 using Volo.Abp.Swashbuckle;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Volo.Abp.Data;
+using Volo.Abp.Identity;
+using LiteAbpUBD.Common;
 using LiteAbpUBD.Business;
-using Microsoft.OpenApi.Models;
+using Volo.Abp.AspNetCore.Mvc.Localization;
+using LiteAbpUBD.Business.Localization;
+using Volo.Abp.VirtualFileSystem;
+using LiteAbpUBD.DataAccess;
+using LiteAbpUBD.Example.Business;
+using LiteAbpUBD.Example.DataAccess;
+using Volo.Abp.Auditing;
 
 namespace LiteAbpUBD.Web
 {
     [DependsOn(
+        typeof(CommonModule),
         typeof(BusinessModule),
+        typeof(ExampleBusinessModule),
         typeof(AbpSwashbuckleModule),
         typeof(AbpAspNetCoreMvcModule),
         typeof(AbpAutofacModule),
@@ -26,6 +37,14 @@ namespace LiteAbpUBD.Web
         )]
     public class WebModule : AbpModule
     {
+        public override void PreConfigureServices(ServiceConfigurationContext context)
+        {
+            context.Services.PreConfigure<AbpMvcDataAnnotationsLocalizationOptions>(options =>
+            {
+                options.AddAssemblyResource(typeof(BusinessResource), typeof(BusinessModule).Assembly);
+                options.AddAssemblyResource(typeof(ExampleBusinessResource), typeof(ExampleBusinessModule).Assembly);
+            });
+        }
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             var hostingEnvironment = context.Services.GetHostingEnvironment();
@@ -36,6 +55,17 @@ namespace LiteAbpUBD.Web
 
             Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
             Configure<IISServerOptions>(options => options.AllowSynchronousIO = true);
+
+            //实体历史记录
+            Configure<AbpAuditingOptions>(options =>
+            {
+                options.EntityHistorySelectors.Add(
+                    new NamedTypeSelector(
+                        "HistoryRecordedEntity",
+                        type => typeof(IHistoryRecordedEntity).IsAssignableFrom(type)
+                    )
+                );
+            });
 
             //配置认证
             context.Services.AddAuthentication();
@@ -48,6 +78,7 @@ namespace LiteAbpUBD.Web
                 options.AccessDeniedPath = "/home/forbidden";
             });
             context.Services.AddAuthorization();
+
 
             //配置Swagger
             context.Services.AddAbpSwaggerGen(
@@ -69,11 +100,11 @@ namespace LiteAbpUBD.Web
 
                     options.AddSecurityRequirement(new OpenApiSecurityRequirement(){
                                                     {
-                                                     new OpenApiSecurityScheme{Reference = new OpenApiReference{Type = ReferenceType.SecurityScheme,Id = "ApiKey"}},new string[]{ }
+                                                     new OpenApiSecurityScheme{Reference = new OpenApiReference{Type = ReferenceType.SecurityScheme,Id = "ApiKey"}},Array.Empty<string>()
                                                     }});
-
-                    //options.IncludeXmlComments(Path.Combine(hostingEnvironment.ContentRootPath, "api.web.xml"), true);
-                    //options.IncludeXmlComments(Path.Combine(hostingEnvironment.ContentRootPath, "api.business.xml"));
+                    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{typeof(WebModule).Assembly.GetName().Name}.xml"), true);
+                    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{typeof(BusinessModule).Assembly.GetName().Name}.xml"));
+                    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{typeof(ExampleBusinessModule).Assembly.GetName().Name}.xml"));
                 }
             );
 
@@ -96,16 +127,27 @@ namespace LiteAbpUBD.Web
                         .AllowCredentials();
                 });
             });
-            //全局取消防伪验证
-            Configure<AbpAntiForgeryOptions>(options =>
+            ////全局取消防伪验证
+            //Configure<AbpAntiForgeryOptions>(options =>
+            //{
+            //    //options.TokenCookie.Expiration = TimeSpan.FromDays(365);
+            //    options.AutoValidateFilter =
+            //        type => false;
+            //});
+            //Configure<RazorPagesOptions>(options => options.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute()));
+
+            if (hostingEnvironment.IsDevelopment())
             {
-                //options.TokenCookie.Expiration = TimeSpan.FromDays(365);
-                options.AutoValidateFilter =
-                    type => false;
-            });
+                //开发中处理嵌入的文件
+                Configure<AbpVirtualFileSystemOptions>(options =>
+                {
+                    options.FileSets.ReplaceEmbeddedByPhysical<BusinessModule>(Path.Combine(hostingEnvironment.ContentRootPath, $"..{Path.DirectorySeparatorChar}LiteAbpUBD.Business"));
+                    options.FileSets.ReplaceEmbeddedByPhysical<ExampleBusinessModule>(Path.Combine(hostingEnvironment.ContentRootPath, $"..{Path.DirectorySeparatorChar}LiteAbpUBD.Example{Path.DirectorySeparatorChar}LiteAbpUBD.Example.Business"));
+                });
+            }
         }
 
-        public override void OnApplicationInitialization(ApplicationInitializationContext context)
+        public override async Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
         {
             var app = context.GetApplicationBuilder();
             var env = context.GetEnvironment();
@@ -115,17 +157,6 @@ namespace LiteAbpUBD.Web
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseAbpRequestLocalization(options =>
-            {
-                options.DefaultRequestCulture = new RequestCulture("zh-Hans");
-                options.SupportedCultures = new[] { new CultureInfo("zh-Hans") };
-                options.RequestCultureProviders = new List<IRequestCultureProvider>
-                {
-                    new QueryStringRequestCultureProvider(),
-                    new CookieRequestCultureProvider()
-                };
-            });
-
             app.UseCorrelationId();
             app.UseStaticFiles();
             app.UseRouting();
@@ -134,6 +165,7 @@ namespace LiteAbpUBD.Web
             app.UseUnitOfWork();
             app.UseAuthentication();
             app.UseAuthorization();
+
             app.UseSwagger();
             app.UseAbpSwaggerUI(options =>
             {
@@ -144,6 +176,18 @@ namespace LiteAbpUBD.Web
             app.UseAbpSerilogEnrichers();
             app.UseConfiguredEndpoints();
 
+            await SeedDataAsync(context);
         }
+
+        private static async Task SeedDataAsync(ApplicationInitializationContext context)
+        {
+            using var scope = context.ServiceProvider.CreateScope();
+            await scope.ServiceProvider
+                .GetRequiredService<IDataSeeder>()
+                .SeedAsync(new DataSeedContext(null)
+                     .WithProperty(IdentityDataSeedContributor.AdminEmailPropertyName, IdentityDataSeedContributor.AdminEmailDefaultValue)
+                     .WithProperty(IdentityDataSeedContributor.AdminPasswordPropertyName, "123456"));
+        }
+
     }
 }

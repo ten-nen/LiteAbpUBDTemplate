@@ -1,21 +1,17 @@
 ﻿
 using LiteAbpUBD.Business.Dtos;
-using LiteAbpUBD.DataAccess;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Data;
-using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Identity;
 
 namespace LiteAbpUBD.Business.Services
 {
-    public class UserService : ApplicationService
+    public class UserService : BaseService
     {
-        protected LiteAbpUBDDbContext DbContext => LazyServiceProvider.LazyGetRequiredService<IDbContextProvider<LiteAbpUBDDbContext>>().GetDbContextAsync().Result;
         protected IdentityUserManager UserManager { get; }
         public UserService(
             IdentityUserManager userManager)
@@ -23,31 +19,33 @@ namespace LiteAbpUBD.Business.Services
             UserManager = userManager;
         }
 
-        public virtual PagedResultDto<UserDto> GetList(UserPagerQueryDto dto)
+        public virtual async Task<PagedResultDto<UserDto>> GetListAsync(UserPagerQueryDto dto)
         {
-            var query = DbContext.Set<IdentityUser>().Include(x => x.Roles).Where(x => !x.IsDeleted);
+            var db = await GetDbContextAsync();
+            var query = db.Set<IdentityUser>().Include(x => x.Roles).Where(x => !x.IsDeleted);
             query = query.WhereIf(!dto.Filter.IsNullOrWhiteSpace(), x => (x.UserName != null && x.UserName.Contains(dto.Filter)) || (x.Name != null && x.Name.Contains(dto.Filter)));
             query = query.WhereIf(dto.RoleId.HasValue, x => x.Roles.Any(r => r.RoleId == dto.RoleId.Value));
-            var count = query.Count();
+            var count = await query.CountAsync();
             query = query.PageBy(dto.SkipCount, dto.MaxResultCount);
-            var users = query.ToList();
+            var users = await query.ToListAsync();
             var roleIds = users.SelectMany(x => x.Roles.Select(r => r.RoleId));
-            var roles = DbContext.Set<IdentityRole>().Where(x => roleIds.Contains(x.Id)).ToList();
+            var roles = await db.Set<IdentityRole>().Where(x => roleIds.Contains(x.Id)).ToListAsync();
             var userDtos = users.Select(x =>
             {
                 var userDto = ObjectMapper.Map<IdentityUser, UserDto>(x);
+                userDto.ApiSecret = x.GetProperty<string>(nameof(userDto.ApiSecret));
                 userDto.Roles = ObjectMapper.Map<IEnumerable<IdentityRole>, List<RoleDto>>(roles.Where(r => x.Roles.Any(u => u.RoleId == r.Id)));
                 return userDto;
             }).ToList();
             return new PagedResultDto<UserDto>(count, userDtos);
         }
 
-        public virtual UserDto CreateOrUpdate(UserCreateOrUpdateDto dto)
+        public virtual async Task<UserDto> CreateOrUpdateAsync(UserCreateOrUpdateDto dto)
         {
             IdentityUser user;
             if (dto.Id.HasValue)
             {
-                user = UserManager.FindByIdAsync(dto.Id.Value.ToString()).Result;
+                user = await UserManager.FindByIdAsync(dto.Id.Value.ToString());
                 if (user == null)
                     throw new UserFriendlyException("用户不存在");
 
@@ -76,21 +74,21 @@ namespace LiteAbpUBD.Business.Services
                 IdentityResult result;
                 if (!string.IsNullOrWhiteSpace(dto.Password))
                 {
-                    result = UserManager.RemovePasswordAsync(user).Result;
+                    result = await UserManager.RemovePasswordAsync(user);
                     if (!result.Succeeded)
                         throw new AbpIdentityResultException(result);
                     UserManager.PasswordValidators.Clear();
-                    result = UserManager.AddPasswordAsync(user, dto.Password).Result;
+                    result = await UserManager.AddPasswordAsync(user, dto.Password);
                     if (!result.Succeeded)
                         throw new AbpIdentityResultException(result);
                 }
-                result = UserManager.UpdateAsync(user).Result;
+                result = await UserManager.UpdateAsync(user);
                 if (!result.Succeeded)
                     throw new AbpIdentityResultException(result);
             }
             else
             {
-                var exists = UserManager.FindByNameAsync(dto.UserName).Result != null;
+                var exists = await UserManager.FindByNameAsync(dto.UserName) != null;
                 if (exists)
                     throw new UserFriendlyException("用户名已存在");
 
@@ -110,24 +108,26 @@ namespace LiteAbpUBD.Business.Services
                 if (!string.IsNullOrEmpty(dto.ApiSecret))
                     user.SetProperty(nameof(dto.ApiSecret), dto.ApiSecret, false);
 
-                var result = UserManager.CreateAsync(user, dto.Password, false).Result;
+                var result = await UserManager.CreateAsync(user, dto.Password, false);
                 if (!result.Succeeded)
                     throw new AbpIdentityResultException(result);
             }
 
-            CurrentUnitOfWork.SaveChangesAsync().Wait();
+            await CurrentUnitOfWork.SaveChangesAsync();
 
             return ObjectMapper.Map<IdentityUser, UserDto>(user);
         }
 
-        public virtual void Delete(Guid id)
+        public virtual async Task DeleteAsync(Guid id)
         {
-            var user = DbContext.Set<IdentityUser>().FirstOrDefault(x => x.Id == id);
+            var db = await GetDbContextAsync();
+            var user = await db.Set<IdentityUser>().FirstOrDefaultAsync(x => x.Id == id);
             if (user == null)
                 return;
             user.IsDeleted = true;
-            DbContext.Set<IdentityUser>().Update(user);
-            DbContext.SaveChanges();
+            db.Set<IdentityUser>().Update(user);
+            await db.SaveChangesAsync();
         }
+
     }
 }

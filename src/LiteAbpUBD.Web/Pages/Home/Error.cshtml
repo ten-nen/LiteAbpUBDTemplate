@@ -1,0 +1,47 @@
+﻿@page
+@{
+    Layout = null;
+}
+@using System.Net
+@model ErrorModel
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>@(Model.HttpStatusCode == HttpStatusCode.NotFound ? "页面未找到" : Model.HttpStatusCode == HttpStatusCode.InternalServerError ? "服务器发生错误" : Model.HttpStatusCode == HttpStatusCode.Forbidden ? "没有权限" : "") - LiteAbpUBD</title>
+    <!-- CSS files -->
+    <link href="~/libs/tabler/css/tabler.min.css" rel="stylesheet" />
+    <link href="~/libs/tabler/css/tabler-flags.min.css" rel="stylesheet" />
+    <link href="~/libs/tabler/css/tabler-payments.min.css" rel="stylesheet" />
+    <link href="~/libs/tabler/css/tabler-vendors.min.css" rel="stylesheet" />
+</head>
+<body class=" border-top-wide border-primary d-flex flex-column">
+    <div class="page page-center">
+        <div class="container-tight py-4">
+            <div class="empty">
+                <div class="empty-header">@Model</div>
+                <p class="empty-title">提示信息</p>
+                <p class="empty-subtitle text-muted">
+                    @(Model.HttpStatusCode == HttpStatusCode.NotFound ? "抱歉，未找到您要访问的页面.." : Model.HttpStatusCode == HttpStatusCode.InternalServerError ? "抱歉，服务器发生了错误，请重新尝试.." : Model.HttpStatusCode == HttpStatusCode.Forbidden ? "抱歉，您没有此权限，请联系管理员.." : "")
+                </p>
+                <div class="empty-action">
+                    <a href="javascript:void(0);" class="btn btn-primary" onclick="backToHome()">
+                        <!-- Download SVG icon from http://tabler-icons.io/i/arrow-left -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><line x1="5" y1="12" x2="19" y2="12"></line><line x1="5" y1="12" x2="11" y2="18"></line><line x1="5" y1="12" x2="11" y2="6"></line></svg>
+                        返回首页
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function backToHome() {
+            if (window.parent != window.self && window.parent.backToHome && typeof (window.parent.backToHome) == 'function')
+                window.parent.backToHome();
+            else
+                location.href = '/';
+        }
+    </script>
+</body>
+</html>

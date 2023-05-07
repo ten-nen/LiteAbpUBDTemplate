@@ -1,61 +1,43 @@
-﻿using LiteAbpUBD.Business;
+﻿
+using LiteAbpUBD.Business;
 using LiteAbpUBD.Business.Dtos;
 using LiteAbpUBD.Business.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp;
-using Volo.Abp.AspNetCore.Mvc;
+using Volo.Abp.Application.Dtos;
+using Volo.Abp.Identity;
 
 namespace LiteAbpUBD.Web.Controllers
 {
-    [Authorize(PermissionConsts.用户管理)]
-    [Route("User")]
-    [ApiExplorerSettings(IgnoreApi = true)]
-    public class UserController : AbpController
+    [Authorize(Permissions.Users.Default)]
+    public class UserController : BaseController
     {
         protected UserService UserService { get; }
-        protected RoleService RoleService { get; }
+        protected IdentityUserManager UserManager { get; }
         public UserController(
-            UserService userService,
-            RoleService roleService)
+             IdentityUserManager userManager,
+            UserService userService)
         {
             UserService = userService;
-            RoleService = roleService;
-        }
-        public IActionResult Index(UserPagerQueryDto dto)
-        {
-            if (Request.IsAjax())
-            {
-                var users = UserService.GetList(dto);
-                return PartialView("ListPartialView", users);
-            }
-            var roles = RoleService.GetAll();
-            return View(roles);
+            UserManager = userManager;
         }
 
+        [HttpGet]
+        public async Task<PagedResultDto<UserDto>> GetAsync(UserPagerQueryDto dto) => await UserService.GetListAsync(dto);
 
-        [Authorize(PermissionConsts.用户管理_新增)]
-        [Route("Create")]
-        public IActionResult Create(UserCreateOrUpdateDto dto) => CreateOrUpdate(dto);
+        [HttpPost]
+        [Authorize(Permissions.Users.Create)]
+        public async Task<UserDto> CreateAsync(UserCreateOrUpdateDto dto) => await CreateOrUpdateAsync(dto);
 
-        [Authorize(PermissionConsts.用户管理_编辑)]
-        [Route("Update")]
-        public IActionResult Update(UserCreateOrUpdateDto dto) => CreateOrUpdate(dto);
+        [HttpPut]
+        [Authorize(Permissions.Users.Update)]
+        public async Task<UserDto> UpdateAsync(UserCreateOrUpdateDto dto) => await CreateOrUpdateAsync(dto);
 
-        private IActionResult CreateOrUpdate(UserCreateOrUpdateDto dto)
-        {
-            if (!ModelState.IsValid)
-                throw new UserFriendlyException("数据验证未通过..");
-            var role = UserService.CreateOrUpdate(dto);
-            return Json(role);
-        }
+        private async Task<UserDto> CreateOrUpdateAsync(UserCreateOrUpdateDto dto) => await UserService.CreateOrUpdateAsync(dto);
 
-        [Authorize(PermissionConsts.用户管理_删除)]
-        [Route("Delete")]
-        public IActionResult Delete(Guid id)
-        {
-            UserService.Delete(id);
-            return new OkResult();
-        }
+        [HttpDelete]
+        [Authorize(Permissions.Users.Delete)]
+        public async Task DeleteAsync(Guid id) => await UserService.DeleteAsync(id);
     }
 }

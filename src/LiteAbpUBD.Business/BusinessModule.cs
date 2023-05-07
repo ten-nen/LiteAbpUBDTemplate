@@ -1,20 +1,24 @@
 ﻿using LiteAbpUBD.DataAccess;
-using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.Identity;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement;
 using Volo.Abp.SettingManagement;
 using Volo.Abp;
-using Volo.Abp.Data;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.Application;
+using Volo.Abp.Localization;
+using Volo.Abp.VirtualFileSystem;
+using LiteAbpUBD.Business.Localization;
+using LiteAbpUBD.Common;
 
 namespace LiteAbpUBD.Business
 {
     [DependsOn(
-        typeof(AbpDddApplicationModule),
+        typeof(CommonModule),
         typeof(DataAccessModule),
+        typeof(AbpLocalizationModule),
+        typeof(AbpDddApplicationModule),
         typeof(AbpAuditLoggingDomainModule),
         typeof(AbpIdentityDomainModule),
         typeof(AbpPermissionManagementDomainModule),
@@ -26,23 +30,25 @@ namespace LiteAbpUBD.Business
         {
             //配置AutoMapper
             Configure<AbpAutoMapperOptions>(options => options.AddMaps<BusinessModule>());
+
+            //本地化
+            Configure<AbpVirtualFileSystemOptions>(options =>
+            {
+                options.FileSets.AddEmbedded<BusinessModule>();
+            });
+            Configure<AbpLocalizationOptions>(options =>
+            {
+                options.Resources
+                    .Add<BusinessResource>("zh-Hans")
+                    .AddVirtualJson("/Localization/BusinessResources");
+            });
+
+            
         }
 
         public async override Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
         {
-            await SeedDataAsync(context);
-        }
 
-        private async Task SeedDataAsync(ApplicationInitializationContext context)
-        {
-            using (var scope = context.ServiceProvider.CreateScope())
-            {
-                await scope.ServiceProvider
-                    .GetRequiredService<IDataSeeder>()
-                    .SeedAsync(new DataSeedContext(null)
-                         .WithProperty(IdentityDataSeedContributor.AdminEmailPropertyName, IdentityDataSeedContributor.AdminEmailDefaultValue)
-                         .WithProperty(IdentityDataSeedContributor.AdminPasswordPropertyName, "123456"));
-            }
         }
     }
 }

@@ -1,60 +1,39 @@
-﻿using LiteAbpUBD.Business;
-using LiteAbpUBD.Business.Dtos;
-using LiteAbpUBD.Business.Services;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp;
-using Volo.Abp.AspNetCore.Mvc;
+using LiteAbpUBD.Business;
+using LiteAbpUBD.Business.Services;
+using LiteAbpUBD.Business.Dtos;
 using Volo.Abp.Authorization.Permissions;
 
 namespace LiteAbpUBD.Web.Controllers
 {
-    [Route("Role")]
-    [Authorize(PermissionConsts.角色管理)]
-    [ApiExplorerSettings(IgnoreApi = true)]
-    public class RoleController : AbpController
+    [Authorize(Permissions.Roles.Default)]
+    public class RoleController : BaseController
     {
         protected RoleService RoleService { get; }
-        protected PermissionValueProvider PermissionValueProvider { get; }
-        public RoleController(RoleService roleService)
+        protected IPermissionDefinitionManager PermissionDefinitionManager { get; }
+        public RoleController(RoleService roleService, IPermissionDefinitionManager permissionDefinitionManager)
         {
             RoleService = roleService;
+            PermissionDefinitionManager = permissionDefinitionManager;
         }
 
         [HttpGet]
-        public IActionResult Index()
-        {
-            if (Request.IsAjax())
-            {
-                var roles = RoleService.GetAll();
-                return PartialView("ListPartialView", roles);
-            }
-            var permissions = PermissionConsts.GetAll();
-            return View(permissions);
-        }
+        public async Task<List<RoleDto>> GetAsync(RolePagerQueryDto dto) => await RoleService.GetListAsync(dto);
+        
+        [HttpPost]
+        [Authorize(Permissions.Roles.Create)]
+        public async Task<RoleDto> CreateAsync(RoleCreateOrUpdateDto dto) => await CreateOrUpdateAsync(dto);
 
-        [Authorize(PermissionConsts.角色管理_新增)]
-        [Route("Create")]
-        public IActionResult Create(RoleCreateOrUpdateDto dto) => CreateOrUpdate(dto);
+        [HttpPut]
+        [Authorize(Permissions.Roles.Update)]
+        public async Task<RoleDto> UpdateAsync(RoleCreateOrUpdateDto dto) => await CreateOrUpdateAsync(dto);
 
-        [Authorize(PermissionConsts.角色管理_编辑)]
-        [Route("Update")]
-        public IActionResult Update(RoleCreateOrUpdateDto dto) => CreateOrUpdate(dto);
-
-        private IActionResult CreateOrUpdate(RoleCreateOrUpdateDto dto)
-        {
-            if (!ModelState.IsValid)
-                throw new UserFriendlyException("数据验证未通过..");
-            var role = RoleService.CreateOrUpdate(dto);
-            return Json(role);
-        }
-
-        [Authorize(PermissionConsts.角色管理_删除)]
-        [Route("Delete")]
-        public IActionResult Delete(Guid id)
-        {
-            RoleService.Delete(id);
-            return new OkResult();
-        }
+        private async Task<RoleDto> CreateOrUpdateAsync(RoleCreateOrUpdateDto dto)=>await RoleService.CreateOrUpdateAsync(dto);
+        
+        [HttpDelete]
+        [Authorize(Permissions.Roles.Create)]
+        public async Task DeleteAsync(Guid id)=>await RoleService.DeleteAsync(id);
     }
 }

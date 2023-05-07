@@ -1,0 +1,15 @@
+﻿@page
+@model IndexModel
+@using Microsoft.AspNetCore.Authorization
+@using LiteAbpUBD.Business
+@{
+    ViewData["Title"] = "主页";
+}
+
+@inject Volo.Abp.Users.ICurrentUser currentUser
+
+<div class="col">
+    <h2 class="page-title">
+        Hello : @currentUser.Name
+    </h2>
+</div>

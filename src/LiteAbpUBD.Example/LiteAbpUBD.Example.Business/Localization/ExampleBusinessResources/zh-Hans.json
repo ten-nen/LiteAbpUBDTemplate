@@ -1,0 +1,10 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+    "Permission:Example": "示例板块",
+    "Permission:Example.Activitys": "活动管理",
+    "Permission:Example.Activitys.Create": "新增活动",
+    "Permission:Example.Activitys.Update": "编辑活动",
+    "Permission:Example.Activitys.Delete": "删除活动"
+  }
+}

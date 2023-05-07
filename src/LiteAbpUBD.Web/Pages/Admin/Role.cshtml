@@ -1,0 +1,263 @@
+﻿@page
+@model RoleModel
+
+@{
+    ViewData["Title"] = "角色管理";
+}
+@using LiteAbpUBD.Business
+@using LiteAbpUBD.Business.Localization;
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Mvc.Localization;
+@using Volo.Abp.Authorization.Permissions
+@using Microsoft.Extensions.Localization
+@inject IAuthorizationService authorizationService
+@inject IPermissionDefinitionManager PermissionDefinitionManager
+@inject IStringLocalizerFactory StringLocalizerFactory
+@inject IHtmlLocalizer<BusinessResource> L
+
+<link href="~/libs/bootstrap-table/bootstrap-table.min.css" rel="stylesheet" />
+<div class="page-body">
+    <div class="container-xl">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-status-top bg-blue"></div>
+                <div class="table-responsive p-2">
+                    <div class="toolbar">
+                        <div class="form-inline" role="form">
+                            <div class="btn-list input-group mb-2">
+                                @if (await authorizationService.IsGrantedAsync(Permissions.Roles.Create))
+                                {
+                                    <a href="javascript:void(0);" class="btn btn-primary d-sm-inline-block" data-bs-toggle="offcanvas" role="button" aria-controls="offcanvasEnd" onclick="page.create()">
+                                        新增
+                                    </a>
+                                }
+                                <input type="text" class="form-control" placeholder="输入关键词查询.." id="page-search-filter">
+                                <button class="btn" type="button" onclick="page.search()">查询</button>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="page-table" class="table table-vcenter card-table">
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="formOffcanvas" aria-labelledby="offcanvasEndLabel" style="min-width:40%;">
+            <div class="offcanvas-header">
+                <h2 class="offcanvas-title"></h2>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div class="mt-3 d-flex justify-content-end">
+                    <button class="btn btn-primary" type="button" onclick="page.save()">
+                        保存
+                    </button>
+                </div>
+                <form id="form">
+                    <div class="mb-3">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" />
+                        <label class="form-label">角色名称</label>
+                        <input type="text" class="form-control" name="name" placeholder="请输入角色名称" required>
+                        <div class="invalid-feedback">
+                            角色名称不能为空
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">权限设置</label>
+                        <div class="card-tabs" id="page-form-permission">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="t-table-row-operator">
+    {{if !row.isStatic && abp.auth.isGranted('Admin.Roles.Update')}}
+    <a href="#" class="btn btn-ghost-primary" onclick="page.edit({{row}})">编辑</a>
+    {{/if}}
+    {{if !row.isStatic && abp.auth.isGranted('Admin.Roles.Delete')}}
+    <a href="#" class="btn btn-ghost-danger" onclick="page.del({{row}})">删除</a>
+    {{/if}}
+</script>
+<script type="text/html" id="t-form-permissionGroup">
+    <ul class="nav nav-tabs" role="tablist">
+        {{each groups}}
+            <li class="nav-item" role="presentation"><a href="#tab-top-{{$index}}" class="nav-link {{$index==0?'active':''}}" data-bs-toggle="tab" aria-selected="true" role="tab">{{$value.displayName}}</a></li>
+        {{/each}}
+    </ul>
+    <div class="tab-content">
+        {{each groups}}
+            <div id="tab-top-{{$index}}" class="card tab-pane {{$index==0?'active show':''}}" role="tabpanel">
+                <div class="card-body">
+                    {{include 't-form-permission' $value}}
+                </div>
+            </div>
+        {{/each}}
+    </div>
+</script>
+<script type="text/html" id="t-form-permission">
+    {{each permissions}}
+            <div class="row page-modal-div-permission">
+                <div class="col-12">
+                    <label class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="Permissions" value="{{$value.name}}" onchange="page.checkPermission(this)">
+                        <span class="form-check-label">{{$value.displayName}}</span>
+                    </label>
+                </div>
+                <div class="col-1"></div>
+                <div class="col-11">
+                      {{include 't-form-permission-child' $value}}
+                </div>
+            </div>
+
+    {{/each}}
+</script>
+<script type="text/html" id="t-form-permission-child">
+    {{each childPermissions}}
+    <label class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" name="Permissions" value="{{$value.name}}" onchange="page.checkChildPermission(this)">
+        <span class="form-check-label">{{$value.displayName}}</span>
+    </label>
+     {{/each}}
+</script>
+@section Scripts{
+    <script src="~/libs/bootstrap-table/bootstrap-table.min.js"></script>
+    <script src="~/libs/bootstrap-table/bootstrap-table-zh-cn.min.js"></script>
+    <script type="text/javascript">
+
+        var page = {
+            url: '/api/role',
+            $filter: $('#page-search-filter'),
+            bsTable: $('#page-table'),
+            bsOffcanvas: new bootstrap.Offcanvas('#formOffcanvas'),
+            $offcanvasTitle: $('.offcanvas-title'),
+            $form: $('#form'),
+            $id: $('#form').find('input[name=id]'),
+            $RequestVerificationToken: $('#form').find('input:hidden[name="__RequestVerificationToken"]'),
+            init: function () {
+                var self = this;
+
+                self.bsTable.bootstrapTable({
+                    cardView: $(window).width() <= 640,
+                    uniqueId: 'id',
+                    toolbar: '.toolbar',
+                    pageNumber: 1,
+                    pageList: [10, 25, 50, 100],
+                    pageSize: 10,
+                    classes: 'table-striped table-hover',
+                    pagination: true,
+                    sidePagination: 'server',
+                    columns: [{
+                        field: 'name',
+                        title: '角色名称',
+                    }, {
+                        field: 'id',
+                        title: '操作',
+                        formatter: function (value, row, index, field) {
+                            return template('t-table-row-operator', { abp: abp, row: row });
+                        },
+                    }],
+                    ajax: function (params) {
+                        abp.ajax({
+                            url: self.url,
+                            type: 'GET',
+                            data: {
+                                filter: self.$filter.val(),
+                                skipCount: params.data.offset,
+                                maxResultCount: params.data.limit,
+                                sorting: params.data.sort + ' ' + params.data.order,
+                            },
+                        }).then(function (res) {
+                            params.success({ total: res.length, rows: res })
+                        })
+                    }
+                });
+
+                //输入框回车查询
+                abp.utils.inputEnter('#page-search-filter', function () { self.bsTable.bootstrapTable('refresh'); });
+
+                var permissions = Object.keys(abp.auth.policies);
+                var findChildPermissions = function (name, localization) {
+                    return permissions.filter(function (x) { return name.indexOf('.') == -1 ? x.split('.').length == 2 && x.startsWith(name + '.') : x.startsWith(name + '.'); }).map(function (x) {
+                        return {
+                            name: x,
+                            displayName: localization['Permission:' + x] || x,
+                            childPermissions: findChildPermissions(x, localization)
+                        };
+                    });
+                };
+                var html = template('t-form-permissionGroup', { groups: [{ name: 'Admin', displayName: abp.localization.values.Business['Permission:Admin'], permissions: findChildPermissions('Admin', abp.localization.values.Business) }, { name: 'Example', displayName: abp.localization.values.ExampleBusiness['Permission:Example'], permissions: findChildPermissions('Example', abp.localization.values.ExampleBusiness) }] });
+                $('#page-form-permission').html(html);
+            },
+            search: function () {
+                var self = this;
+                self.bsTable.bootstrapTable('refresh');
+            },
+            create: function () {
+                var self = this;
+                abp.utils.form.reset(self.$form[0]);
+                abp.utils.form.setValues(self.$form[0], { id: '' });
+                self.$offcanvasTitle.text('新增角色');
+                self.bsOffcanvas.show();
+            },
+            edit: function (row) {
+                var self = this;
+                abp.utils.form.setValues(self.$form[0], row);
+                self.$offcanvasTitle.text('编辑角色');
+                self.bsOffcanvas.show();
+            },
+            del: function (row) {
+                var self = this;
+                abp.message.confirm('删除后无法恢复', function () {
+                    abp.ajax({
+                        url: self.url,
+                        type: "DELETE",
+                        headers: {
+                            "RequestVerificationToken": self.$RequestVerificationToken.val()
+                        },
+                        data: { id: row.id }
+                    }).then(function () {
+                        self.bsTable.bootstrapTable('refresh');
+                        abp.notify.success('删除成功..');
+                    })
+                })
+            },
+            save: function () {
+                var self = this;
+                if (!self.$form[0].checkValidity()) {
+                    self.$form.addClass('was-validated')
+                } else {
+                    var id = self.$id.val();
+                    abp.ajax({
+                        url: self.url,
+                        type: id ? 'PUT' : 'POST',
+                        headers: {
+                            "RequestVerificationToken": self.$RequestVerificationToken.val()
+                        },
+                        data: self.$form.serialize()
+                    }).then(function () {
+                        self.bsTable.bootstrapTable('refresh');
+                        abp.notify.success('保存成功..');
+                        self.bsOffcanvas.hide();
+                    })
+                }
+            },
+            checkPermission: function (element) {
+                var checked = $(element).is(':checked');
+                $(element).parents('.page-modal-div-permission').find('.col-11 input[type=checkbox]').prop('checked', checked);
+            },
+            checkChildPermission: function (element) {
+                var checked = $(element).is(':checked');
+                if (checked) {
+                    $(element).parents('.page-modal-div-permission').find('.col-12 input[type=checkbox]').prop('checked', checked);
+                }
+            },
+        };
+
+        page.init();
+
+    </script>
+}

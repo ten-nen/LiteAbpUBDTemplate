@@ -7,49 +7,256 @@
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<PreserveCompilationReferences>true</PreserveCompilationReferences>
 		<GenerateRuntimeConfigDevFile>true</GenerateRuntimeConfigDevFile>
-		<GenerateDocumentationFile>False</GenerateDocumentationFile>
-		<DocumentationFile>E:\source\repos\demo\github\LiteAbpUBDTemplate\src\LiteAbpUBD.Web\api.web.xml</DocumentationFile>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Logs\**" />
-	  <Content Remove="Logs\**" />
-	  <EmbeddedResource Remove="Logs\**" />
-	  <None Remove="Logs\**" />
+		<Compile Remove="Logs\**" />
+		<Compile Remove="wwwroot\js\crm\**" />
+		<Content Remove="Logs\**" />
+		<Content Remove="wwwroot\js\crm\**" />
+		<EmbeddedResource Remove="Logs\**" />
+		<EmbeddedResource Remove="wwwroot\js\crm\**" />
+		<None Remove="Logs\**" />
+		<None Remove="wwwroot\js\crm\**" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Remove="Views\Menu\Index.cshtml" />
-	  <Content Remove="Views\Menu\ListPartialView.cshtml" />
+		<None Include="wwwroot\libs\abp\core\abp.js" />
+		<None Include="wwwroot\libs\abp\jquery\abp.jquery.js" />
+		<None Include="wwwroot\libs\abp\luxon\abp.luxon.js" />
+		<None Include="wwwroot\libs\abp\utils\abp-utils.umd.js" />
+		<None Include="wwwroot\libs\abp\utils\abp-utils.umd.js.map" />
+		<None Include="wwwroot\libs\abp\utils\abp-utils.umd.min.js" />
+		<None Include="wwwroot\libs\abp\utils\abp-utils.umd.min.js.map" />
+		<None Include="wwwroot\libs\jquery\jquery.js" />
+		<None Include="wwwroot\libs\lodash\lodash.min.js" />
+		<None Include="wwwroot\libs\luxon\luxon.js" />
+		<None Include="wwwroot\libs\luxon\luxon.js.map" />
+		<None Include="wwwroot\libs\luxon\luxon.min.js" />
+		<None Include="wwwroot\libs\luxon\luxon.min.js.map" />
+		<None Include="wwwroot\libs\select2\js\i18n\af.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\ar.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\az.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\bg.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\bn.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\bs.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\ca.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\cs.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\da.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\de.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\dsb.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\el.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\en.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\es.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\et.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\eu.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\fa.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\fi.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\fr.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\gl.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\he.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\hi.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\hr.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\hsb.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\hu.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\hy.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\id.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\is.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\it.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\ja.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\ka.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\km.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\ko.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\lt.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\lv.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\mk.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\ms.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\nb.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\ne.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\nl.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\pl.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\ps.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\pt-BR.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\pt.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\ro.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\ru.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\sk.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\sl.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\sq.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\sr-Cyrl.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\sr.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\sv.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\th.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\tk.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\tr.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\uk.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\vi.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\zh-CN.js" />
+		<None Include="wwwroot\libs\select2\js\i18n\zh-TW.js" />
+		<None Include="wwwroot\libs\select2\js\select2.full.min.js" />
+		<None Include="wwwroot\libs\select2\js\select2.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\icons\default\icons.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\jquery.tinymce.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\langs\README.md" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\advlist\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\anchor\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\autolink\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\autoresize\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\autosave\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\bbcode\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\charmap\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\codesample\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\code\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\colorpicker\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\contextmenu\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\directionality\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\emoticons\js\emojiimages.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\emoticons\js\emojiimages.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\emoticons\js\emojis.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\emoticons\js\emojis.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\emoticons\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\fullpage\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\fullscreen\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\help\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\hr\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\imagetools\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\image\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\importcss\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\insertdatetime\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\legacyoutput\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\link\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\lists\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\media\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\nonbreaking\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\noneditable\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\pagebreak\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\paste\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\preview\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\print\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\quickbars\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\save\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\searchreplace\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\spellchecker\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\tabfocus\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\table\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\template\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\textcolor\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\textpattern\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\toc\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\visualblocks\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\visualchars\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\plugins\wordcount\plugin.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\themes\mobile\theme.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\themes\silver\theme.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\tinymce.min.js" />
+		<None Include="wwwroot\libs\tabler\libs\tinymce\tinymce.zh_CN.js" />
+		<None Include="wwwroot\libs\timeago\jquery.timeago.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.af.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.am.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.ar.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.az-short.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.az.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.be.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.bg.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.bs.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.ca.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.cs.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.cy.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.da.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.de-short.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.de.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.dv.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.el.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.en-short.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.en.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.es-short.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.es.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.et.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.eu.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.fa-short.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.fa.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.fi.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.fr-short.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.fr.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.gl.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.he.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.hr.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.hu.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.hy.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.id.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.is.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.it-short.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.it.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.ja.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.jv.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.ko.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.ky.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.lt.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.lv.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.mk.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.nl.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.no.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.pl.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.pt-br-short.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.pt-br.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.pt-short.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.pt.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.ro.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.rs.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.ru.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.rw.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.si.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.sk.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.sl.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.sq.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.sr.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.sv.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.th.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.tr-short.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.tr.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.uk.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.ur.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.uz.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.vi.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.zh-CN.js" />
+		<None Include="wwwroot\libs\timeago\locales\jquery.timeago.zh-TW.js" />
+		<None Include="wwwroot\libs\timeago\locales\README.md" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <None Include="Views\Home\Error.cshtml" />
-	  <None Include="Views\Menu\Index.cshtml" />
-	  <None Include="Views\Menu\ListPartialView.cshtml" />
-	</ItemGroup>
-	
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.8" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.13" />
 		<PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
 		<PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
-		<PackageReference Include="Volo.Abp.AspNetCore.Authentication.JwtBearer" Version="6.0.2" />
-		<PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="6.0.2" />
-		<PackageReference Include="Volo.Abp.Autofac" Version="6.0.2" />
-		<PackageReference Include="Volo.Abp.Identity.AspNetCore" Version="6.0.2" />
-		<PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="6.0.2" />
-		<PackageReference Include="Volo.Abp.Swashbuckle" Version="6.0.2" />
+		<PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="6.0.3" />
+		<PackageReference Include="Volo.Abp.Autofac" Version="6.0.3" />
+		<PackageReference Include="Volo.Abp.Identity.AspNetCore" Version="6.0.3" />
+		<PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="6.0.3" />
+		<PackageReference Include="Volo.Abp.Swashbuckle" Version="6.0.3" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<ProjectReference Include="..\LiteAbpUBD.Business\LiteAbpUBD.Business.csproj" />
+		<ProjectReference Include="..\LiteAbpUBD.Common\LiteAbpUBD.Common.csproj" />
+		<ProjectReference Include="..\LiteAbpUBD.Example\LiteAbpUBD.Example.Business\LiteAbpUBD.Example.Business.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\LiteAbpUBD.Business\LiteAbpUBD.Business.csproj" />
+		<Content Update="Pages\Shared\_Layout.cshtml">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Update="Pages\Shared\_ValidationScriptsPartial.cshtml">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Update="Views\Shared\_Layout.cshtml">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
+		<None Update="api.web.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 </Project>

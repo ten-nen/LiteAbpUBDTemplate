@@ -5,18 +5,17 @@ using Volo.Abp.Identity.EntityFrameworkCore;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
-using Volo.Abp;
-using Volo.Abp.Data;
-using Volo.Abp.Identity;
 #if (mysql)
 using Volo.Abp.EntityFrameworkCore.MySQL;
 #else
 using Volo.Abp.EntityFrameworkCore.SqlServer;
 #endif
+using LiteAbpUBD.Common;
 
 namespace LiteAbpUBD.DataAccess
 {
     [DependsOn(
+       typeof(CommonModule),
        typeof(AbpIdentityEntityFrameworkCoreModule),
        typeof(AbpPermissionManagementEntityFrameworkCoreModule),
        typeof(AbpSettingManagementEntityFrameworkCoreModule),
@@ -33,7 +32,7 @@ namespace LiteAbpUBD.DataAccess
         //                 dotnet ef database update
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            context.Services.AddAbpDbContext<LiteAbpUBDDbContext>(options =>
+            context.Services.AddAbpDbContext<DbContext>(options =>
             {
                 /* Remove "includeAllEntities: true" to create
                  * default repositories only for aggregate roots */

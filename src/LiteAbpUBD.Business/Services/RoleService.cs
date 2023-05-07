@@ -1,5 +1,6 @@
 ﻿using LiteAbpUBD.Business.Dtos;
-using LiteAbpUBD.DataAccess;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Authorization.Permissions;
@@ -10,9 +11,8 @@ using Volo.Abp.PermissionManagement;
 
 namespace LiteAbpUBD.Business.Services
 {
-    public class RoleService : ApplicationService
+    public class RoleService : BaseService
     {
-        protected LiteAbpUBDDbContext DbContext => LazyServiceProvider.LazyGetRequiredService<IDbContextProvider<LiteAbpUBDDbContext>>().GetDbContextAsync().Result;
         protected IPermissionValueProvider PermissionValueProvider { get; }
         protected IDistributedCache<PermissionGrantCacheItem> Cache { get; }
 
@@ -24,11 +24,12 @@ namespace LiteAbpUBD.Business.Services
             Cache = cache;
         }
 
-        public virtual List<RoleDto> GetAll()
+        public virtual async Task<List<RoleDto>> GetListAsync(RolePagerQueryDto dto)
         {
-            var roles = DbContext.Set<IdentityRole>();
+            var db = await GetDbContextAsync();
+            var roles = db.Set<IdentityRole>().WhereIf(!string.IsNullOrWhiteSpace(dto.Filter), x => x.Name.Contains(dto.Filter));
             var roleNames = roles.Select(x => x.Name);
-            var permissions = DbContext.Set<PermissionGrant>().Where(x => x.ProviderName == PermissionValueProvider.Name && roleNames.Contains(x.ProviderKey)).ToList();
+            var permissions = await db.Set<PermissionGrant>().Where(x => x.ProviderName == PermissionValueProvider.Name && roleNames.Contains(x.ProviderKey)).ToListAsync();
             var r = ObjectMapper.Map<List<IdentityRole>, List<RoleDto>>(roles.ToList());
             r.ForEach(x =>
             {
@@ -37,66 +38,68 @@ namespace LiteAbpUBD.Business.Services
             return r;
         }
 
-        public virtual RoleDto CreateOrUpdate(RoleCreateOrUpdateDto dto)
+        public virtual async Task<RoleDto> CreateOrUpdateAsync(RoleCreateOrUpdateDto dto)
         {
+            var db = await GetDbContextAsync();
             IdentityRole role;
             if (dto.Id.HasValue)
             {
-                role = DbContext.Set<IdentityRole>().FirstOrDefault(x => x.Id == dto.Id.Value);
+                role = await db.Set<IdentityRole>().FirstOrDefaultAsync(x => x.Id == dto.Id.Value);
                 if (role == null)
                     throw new UserFriendlyException("角色不存在");
                 if (role.Name != dto.Name)
                 {
-                    var exists = DbContext.Set<IdentityRole>().Any(x => x.Id != role.Id && x.Name == dto.Name);
+                    var exists = await db.Set<IdentityRole>().AnyAsync(x => x.Id != role.Id && x.Name == dto.Name);
                     if (exists)
                         throw new UserFriendlyException("角色名称已存在");
 
                     role.ChangeName(dto.Name);
-                    DbContext.Set<IdentityRole>().Update(role);
+                    db.Set<IdentityRole>().Update(role);
                 }
             }
             else
             {
-                var exsits = DbContext.Set<IdentityRole>().Any(x => x.Name == dto.Name);
+                var exsits = await db.Set<IdentityRole>().AnyAsync(x => x.Name == dto.Name);
                 if (exsits)
                     throw new UserFriendlyException("角色名称已存在");
 
                 role = new IdentityRole(GuidGenerator.Create(), dto.Name);
-                DbContext.Set<IdentityRole>().Add(role);
+                await db.Set<IdentityRole>().AddAsync(role);
             }
 
             if (dto.Id.HasValue)
             {
-                var deletes = DbContext.Set<PermissionGrant>().Where(x => x.ProviderName == PermissionValueProvider.Name && x.ProviderKey == dto.Name);
+                var deletes = db.Set<PermissionGrant>().Where(x => x.ProviderName == PermissionValueProvider.Name && x.ProviderKey == dto.Name);
 
                 //删除权限缓存
-                Cache.RemoveMany(deletes.Select(x => PermissionGrantCacheItem.CalculateCacheKey(x.Name, PermissionValueProvider.Name, dto.Name)));
+                await Cache.RemoveManyAsync(deletes.Select(x => PermissionGrantCacheItem.CalculateCacheKey(x.Name, PermissionValueProvider.Name, dto.Name)));
 
-                DbContext.Set<PermissionGrant>().RemoveRange(deletes);
+                db.Set<PermissionGrant>().RemoveRange(deletes);
             }
             if (dto.Permissions != null && dto.Permissions.Any())
-                DbContext.Set<PermissionGrant>().AddRange(dto.Permissions.Select(x => new PermissionGrant(GuidGenerator.Create(), x, PermissionValueProvider.Name, role.Name)));
+                await db.Set<PermissionGrant>().AddRangeAsync(dto.Permissions.Select(x => new PermissionGrant(GuidGenerator.Create(), x, PermissionValueProvider.Name, role.Name)));
 
-            DbContext.SaveChanges();
+            await db.SaveChangesAsync();
 
             return ObjectMapper.Map<IdentityRole, RoleDto>(role);
         }
 
-        public virtual void Delete(Guid id)
+        public virtual async Task DeleteAsync(Guid id)
         {
-            var role = DbContext.Set<IdentityRole>().FirstOrDefault(x => x.Id == id);
+            var db = await GetDbContextAsync();
+            var role = await db.Set<IdentityRole>().FirstOrDefaultAsync(x => x.Id == id);
             if (role == null)
                 return;
 
-            var rolePermissions = DbContext.Set<PermissionGrant>().Where(x => x.ProviderKey == role.Name);
+            var rolePermissions = db.Set<PermissionGrant>().Where(x => x.ProviderKey == role.Name);
 
             //删除权限缓存
-            Cache.RemoveMany(rolePermissions.Select(x => PermissionGrantCacheItem.CalculateCacheKey(x.Name, PermissionValueProvider.Name, role.Name)));
+            await Cache.RemoveManyAsync(rolePermissions.Select(x => PermissionGrantCacheItem.CalculateCacheKey(x.Name, PermissionValueProvider.Name, role.Name)));
 
-            DbContext.Set<PermissionGrant>().RemoveRange(rolePermissions);
-            DbContext.Set<IdentityRole>().Remove(role);
+            db.Set<PermissionGrant>().RemoveRange(rolePermissions);
+            db.Set<IdentityRole>().Remove(role);
 
-            DbContext.SaveChanges();
+            await db.SaveChangesAsync();
         }
     }
 }
